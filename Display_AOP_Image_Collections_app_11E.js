@@ -565,7 +565,10 @@
           var year = props['FLIGHT_YEAR'];
           var citation = props['CITATION'] || null;
           var product = currentDerivedProduct;
-          var vis = DERIVED_VIS[product];
+          var naturalVis = DERIVED_VIS[product];
+          // Merge in any active Min/Max/Palette override (Universal Image Display
+          // Adjustments panel) for the 1st Image slot, same as addDerivedProductLayer.
+          var vis = applyManualOverride(1, {min: naturalVis.min, max: naturalVis.max, palette: naturalVis.palette});
           var paletteStr = JSON.stringify(vis.palette);
           var site = neonSiteSelect.getValue();
           var idx  = select1.getValue();
@@ -848,7 +851,10 @@
           var year = props['FLIGHT_YEAR'];
           var citation = props['CITATION'] || null;
           var product = currentTerrainProduct;
-          var vis = DERIVED_VIS[product];
+          var naturalVis = DERIVED_VIS[product];
+          // Merge in any active Min/Max/Palette override (Universal Image Display
+          // Adjustments panel) for the 1st Image slot, same as addDerivedProductLayer.
+          var vis = applyManualOverride(1, {min: naturalVis.min, max: naturalVis.max, palette: naturalVis.palette});
           var paletteStr = JSON.stringify(vis.palette);
           var site = neonSiteSelect.getValue();
           var idx  = select1.getValue();
@@ -901,7 +907,7 @@
         var dynamicParams = applyManualOverride(1, getDynamicDSMVisParams(selectedImage));
         selectedImage.toDictionary(['FLIGHT_YEAR', 'CITATION']).evaluate(function(props) {
           var year = props['FLIGHT_YEAR']; var citation = props['CITATION'] || null;
-          var visParamsString = '{bands: [\'DSM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: [\'000000\', \'FFFFFF\']}';
+          var visParamsString = '{bands: [\'DSM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           var sampleScript = generateScriptContent(template, selectedSite, selectedImageIndex, year, visParamsString);
           if (citation) sampleScript = '// Citation: ' + citation + '\n\n' + sampleScript;
           displaySampleScript(sampleScript);
@@ -910,7 +916,7 @@
         var dynamicParams = applyManualOverride(1, getDynamicDTMVisParams(selectedImage));
         selectedImage.toDictionary(['FLIGHT_YEAR', 'CITATION']).evaluate(function(props) {
           var year = props['FLIGHT_YEAR']; var citation = props['CITATION'] || null;
-          var visParamsString = '{bands: [\'DTM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: [\'000000\', \'FFFFFF\']}';
+          var visParamsString = '{bands: [\'DTM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           var sampleScript = generateScriptContent(template, selectedSite, selectedImageIndex, year, visParamsString);
           if (citation) sampleScript = '// Citation: ' + citation + '\n\n' + sampleScript;
           displaySampleScript(sampleScript);
@@ -920,7 +926,7 @@
         selectedImage.toDictionary(['FLIGHT_YEAR', 'CITATION']).evaluate(function(props) {
           var year = props['FLIGHT_YEAR'];
           var citation = props['CITATION'] || null;
-          var visParamsString = '{bands: [\'CHM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: [\'E6F7E0\', \'063B00\']}';
+          var visParamsString = '{bands: [\'CHM\'], min: ' + dynamicParams.min + ', max: ' + dynamicParams.max + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           var sampleScript = generateScriptContent(template, selectedSite, selectedImageIndex, year, visParamsString);
           if (citation) {
             sampleScript = '// Citation: ' + citation + '\n\n' + sampleScript;
@@ -935,11 +941,11 @@
           var selectedBand = currentNitrogenBand1;
           
           if (selectedBand === 'Canopy Nitrogen Model Uncertainty') {
-            visParamsString = '{bands: [\'Nitrogen_Uncertainty\'], min: ' + dynamicParams.min.toFixed(2) + ', max: ' + dynamicParams.max.toFixed(2) + ', palette: [\'#0d0887\', \'#7e03a8\', \'#cc4778\', \'#f89540\', \'#f0f921\']}';
+            visParamsString = '{bands: [\'Nitrogen_Uncertainty\'], min: ' + dynamicParams.min.toFixed(2) + ', max: ' + dynamicParams.max.toFixed(2) + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           } else if (selectedBand === 'Needle Leaf/Non-Needle Leaf Classification') {
-            visParamsString = '{bands: [\'Needle_Non-needle_Classification\'], min: ' + dynamicParams.min.toFixed(0) + ', max: ' + dynamicParams.max.toFixed(0) + ', palette: [\'olive\', \'green\']}';
+            visParamsString = '{bands: [\'Needle_Non-needle_Classification\'], min: ' + dynamicParams.min.toFixed(0) + ', max: ' + dynamicParams.max.toFixed(0) + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           } else {
-            visParamsString = '{bands: [\'Nitrogen_Percent\'], min: ' + dynamicParams.min.toFixed(2) + ', max: ' + dynamicParams.max.toFixed(2) + ', palette: [\'#440154\', \'#3b528b\', \'#21908c\', \'#5dc963\', \'#fde725\']}';
+            visParamsString = '{bands: [\'Nitrogen_Percent\'], min: ' + dynamicParams.min.toFixed(2) + ', max: ' + dynamicParams.max.toFixed(2) + ', palette: ' + JSON.stringify(dynamicParams.palette) + '}';
           }
           
           var sampleScript = generateScriptContent(template, selectedSite, selectedImageIndex, year, visParamsString);
@@ -2436,7 +2442,10 @@
     function createDerivedLegend(productName, slotNum) {
       var panel = (slotNum === 2) ? derivedLegendPanel2 : derivedLegendPanel1;
       panel.clear();
-      var vis  = DERIVED_VIS[productName];
+      var naturalVis = DERIVED_VIS[productName];
+      // Merge in any active Palette override for this slot so the legend swatch
+      // matches what addDerivedProductLayer actually rendered on the map.
+      var vis  = applyManualOverride(slotNum, {min: naturalVis.min, max: naturalVis.max, palette: naturalVis.palette});
       var meta = DERIVED_LEGEND_META[productName];
 
       panel.add(ui.Label({
@@ -2482,6 +2491,20 @@
       }
     }
 
+    // Resolves the palette a Nitrogen continuous legend's colorbar Thumbnail should
+    // show: an active override for whichever slot (1 preferred, else 2) currently
+    // displays this band, or the hardcoded default if neither slot has one active.
+    function getNitrogenLegendPalette(productKey) {
+      var defaultPalette = (productKey === 'Nitrogen_Uncertainty') ? uncertaintyPalette : percentNPalette;
+      for (var slot = 1; slot <= 2; slot++) {
+        if (getSlotPaletteProductKey(slot) === productKey) {
+          var merged = applyManualOverride(slot, {palette: defaultPalette});
+          if (merged.palette !== defaultPalette) { return merged.palette; }
+        }
+      }
+      return defaultPalette;
+    }
+
     // Function to manage nitrogen continuous legend visibility
     function updateNitrogenContinuousLegendsVisibility() {
       var collection1 = selectCollection1.getValue();
@@ -2506,12 +2529,14 @@
       
       percentNLegendPanel.style().set('shown', showPercentN);
       uncertaintyLegendPanel.style().set('shown', showUncertainty);
-      
-      // Update legend labels with current values
+
+      // Update legend labels and colorbar swatch with current values
       if (showPercentN) {
+        percentNColorBar.setParams(makeColorBarParams(getNitrogenLegendPalette('Nitrogen_Percent')));
         updateNitrogenLegendLabels();
       }
       if (showUncertainty) {
+        uncertaintyColorBar.setParams(makeColorBarParams(getNitrogenLegendPalette('Nitrogen_Uncertainty')));
         updateUncertaintyLegendLabels();
       }
     }
