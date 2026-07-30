@@ -476,10 +476,10 @@
       }
     });
 
-    // Create "Draw and generate stats" button â€” enabled only for eligible
+    // Create "Draw and calculate stats" button â€” enabled only for eligible
     // single-band 1st-image products (see getStatsEligibility()).
     var statsButton = ui.Button({
-      label: 'Draw and generate statistics from 1st image',
+      label: 'Draw and calculate statistics from 1st image',
       onClick: function() {
         openStatsPanel();
       },
@@ -504,7 +504,7 @@
     var statsPanel = ui.Panel({
       widgets: [
         ui.Label('1st Image Region Statistics', {fontWeight: 'bold', fontSize: '14px'}),
-        ui.Label('Draw one or more rectangles or polygons to calculate cumulative statistics', {fontSize: '11px', fontWeight: 'bold', color: 'gray'}),
+        ui.Label('Draw one or more rectangles or polygons to calculate cumulative statistics (single-band images only)', {fontSize: '11px', fontWeight: 'bold', color: 'gray'}),
         statsProductLabel,
         ui.Panel({
           widgets: [statsMinLabel, statsMaxLabel, statsPct98MaxLabel],
@@ -532,7 +532,7 @@
         padding: '10px',
         border: '2px solid purple',
         backgroundColor: '#f5f0fa',
-        width: '300px',
+        width: '320px',
         position: 'bottom-left',
         margin: '10px 0'
       }
@@ -1470,8 +1470,10 @@
         statsStdDevLabel.setValue('StDev: ' + (sd     !== null && sd     !== undefined ? sd.toFixed(dec)     + unit : 'masked'));
 
         var areaKm2 = (result.areaM2 !== null && result.areaM2 !== undefined) ? (result.areaM2 / 1e6) : null;
+        var areaHa  = (result.areaM2 !== null && result.areaM2 !== undefined) ? (result.areaM2 / 1e4) : null;
         statsPixelCountLabel.setValue(n ?
-          (n + ' pixels / ' + (areaKm2 !== null ? areaKm2.toFixed(2) : '—') + ' km2 sampled (scale: 10m)') : '');
+          (n + ' pixels / ' + (areaKm2 !== null ? areaKm2.toFixed(2) : '—') + ' km2 / ' +
+          (areaHa !== null ? areaHa.toFixed(1) : '—') + ' ha sampled (scale: 10m)') : '');
       });
     }
 
@@ -3891,10 +3893,10 @@
       ]);
 
     mainPanel.add(metaTitle)
-              .add(exportButton)
-              .add(exportPanel)
+              .add(statsButton)
               .add(sampleScriptButton)
-              .add(statsButton);
+              .add(exportButton)
+              .add(exportPanel);
 
     var metadataPanel = ui.Panel({
       style: {width: '100%', padding: '8px', border: '1px solid #ccc', margin: '10px 0'}
