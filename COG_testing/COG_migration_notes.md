@@ -2,7 +2,7 @@
 
 Working notes for moving the viewer from ingested images to registered COG tile collections.
 Test build: `Display_AOP_Image_Collections_app_11G_COG_test.js` (copy of 11G; 11G is unchanged).
-Last updated: 2026-11-03.
+Last updated: 2026-11-04 (REDB test set, runs 12 and 13 added).
 
 ## Headline results and implications (as of 2026-11-03)
 
@@ -18,6 +18,8 @@ Evidence is detailed in the run sections below. All timings come from one site-y
 6. **Method findings.** Repeats of the ingested case were served from the Earth Engine result cache until the harness set a unique image property; early ingested timings are invalid. Wall-clock single runs vary by 2x or more, so small differences are not meaningful.
 
 7. **Per-tile reduction avoids most of the mosaic cost.** Reducing each tile separately and combining the results (`REG_TILES`, mean, standard deviation, minimum and maximum only) is 2x to 7x faster in wall-clock time than the mosaicked form (clean run 11: CHM 0.7 s at 9 km and 1.5 s at 20 km against 3.2 s and 10.1 s; RGB 2.7 s and 7.5 s against 7.5 s and 13.2 s), at 1.7x to 3.5x the ingested time (CHM about 1.7x to 1.8x, RGB 2.6x to 3.5x), and it did not hit the memory error the mosaic form hit once at 13 km. Its statistics agree with the mosaic (RGB and CHM means within 0.02%, standard deviations within 0.01%, minimum and maximum identical). In compute the first implementation cost about 34.6 EECU·s at 20 km (356 tiles) against about 171 for the mosaic and about 6.5 for ingested; the current leaner implementation is 2x to 4x slower in wall-clock time than that first one and its EECU has not been measured.
+
+8. **Second site (REDB 2026, RGB, paired; run 12, 2026-11-04).** On a small site (46 tiles) registered is close to ingested in wall-clock time (differences mostly under 2 s; registered up to about 2.8x to 4.8x slower at 10 m over 3 to 5 km, `REG_TILES` about 2x), and coarse-scale means stay within about 0.5% of the 1 m mean while the ingested overviews drift up to +1.1%. Registered standard deviation plateaus above about 32 m. EECU not measured; reflectance timings not yet valid (run 13). This section is not rewritten here; the end-of-testing lessons summary will pull the results together.
 
 ### Implications
 
@@ -468,6 +470,145 @@ Median wall-clock (s), fastest-slowest and ratio to ING:
 - **Statistics agree with the mosaic.** CHM 9 km: mean 7.2946 vs 7.2931, standard deviation 9.2004 vs 9.2007; CHM 20 km: mean 6.6656 vs 6.6659, standard deviation 8.85475 vs 8.85480; RGB as in run 10; minimum and maximum identical.
 - **Leaner version slower than the first.** RGB `REG_TILES` was 1.0 s (9 km) and 2.1 s (20 km) with the first implementation in run 7, and 2.7 s and 7.5 s now, while ING and REG medians are similar between the runs. The extra server operations per tile (empty-tile guard, arithmetic on each tile's results) are the likely cause; the first version had biased means (about 0.2% low) and cost 34.6 EECU·s. EECU of the current version is not measured.
 - Reproducibility of the mosaic medians across clean runs (REG@900): RGB 9 km 7.8, 6.4, 6.2, 7.5 s; RGB 20 km 11.7, 9.3, 10.0, 13.2 s; CHM 9 km 4.3, 6.2, 3.2 s; CHM 20 km 8.4, 10.1, 10.1 s. Ratios to ingested: RGB 9 km 5.0x to 7.1x, RGB 20 km 5.2x to 8.1x, CHM 9 km 7.4x to 12.6x, CHM 20 km 6.3x to 12.3x.
+
+### REDB test set (2026-11-04)
+
+Second site, added 2026-11-04. Inventory run with `cog_redb_inventory.js` (v3) and `cog_redb_anchor.js`; the output was pasted by the user, not saved as a file.
+
+| Item | Detail |
+|---|---|
+| Registered RGB / CHM / DEM | `projects/neon-nonprod-earthengine/assets/{RGB,CHM,DEM}/REG`: 405 / 395 / 395 tiles = `2026_JERC_9` (359 / 352 / 352) + `2026_REDB_6` (46 / 43 / 43). RGB is the semi-final build (overviews 62.5 and 31.25 m rounded up to 63 and 32 m). |
+| Registered reflectance | `.../REFL/REG` (band-interleaved) and `.../testREFL/PIX` (pixel-interleaved): 50 tiles each, `2026_REDB_6` only (entire site, per the data owner), 426 int16 bands B001-B426 (`SCALE_FACTOR` 10000), 1 m, EPSG:32612, AVIRIS-NG, BRDF product (DP3.30006.002). **No `YEAR_SITE_VISIT`** on the test tiles (`AOP_ID` = `2026_REDB_6`; the data owner says the final data will have it). Identical pixel values in both layouts. Wavelengths exist only on the band-interleaved tiles (`WL_FWHM_Bxxx` = "wavelength nm,fwhm"). |
+| Ingested pairs | RGB `projects/neon-prod-earthengine/assets/RGB/001/2026_REDB_6` (also 2017, 2019, 2021, 2022, 2023). CHM and DEM ingested only through `2023_REDB_5`, so registered 2026 lidar cannot be value-compared. Reflectance: `.../HSI_REFL/002/2026_REDB_6` (BRDF), 442 float bands (the 16 extra are QA bands, not used); `HSI_REFL/001` holds 2017, 2019 and 2021 (directional). |
+| Site geometry | 46 RGB tiles cover 46 km² inside a 7 km (E-W) x 8 km (N-S) bounding box (UTM 12N, E 431000-438000, N 4513000-4521000; SE corner cut diagonally). Test anchor (mean of tile centres) lon -111.780094, lat 40.800975. Harness footprint lookup (A1, 2026-11-04) gave centres [-111.776513, 40.801384] (ING) and [-111.776557, 40.801228] (REG), short side 7.0 km. |
+| Water-absorption bands | Set to -100 in the ingested and the registered data (for example B300). |
+
+- **The footprint lookup is slow.** The harness unions every registered tile footprint to find the site centre; for the 46 REDB RGB tiles it took long enough that the user had to leave it running (duration not recorded; the stage timers were added afterwards). `cog_redb_anchor.js` computes the centre from `TILE_EASTING_NORTHING` in seconds, and the harness now accepts `EXTENT_OVERRIDE` to skip the lookup. This is the same union cost listed under Known issues for the viewer (`tiles.geometry()`).
+- **The Profiler was on during run 12 and recorded only the startup checks.** Matrix mode evaluates asynchronously, so no EECU numbers exist for it; use single mode.
+
+### Run 12 (2026-11-04): RGB `stats`, `2026_REDB_6` paired, registered `RGB/REG` vs ingested `RGB/001`
+
+- **Site-year and files:** registered tiles `projects/neon-nonprod-earthengine/assets/RGB/REG` filtered on `YEAR_SITE_VISIT = 2026_REDB_6` (46 tiles); ingested image `projects/neon-prod-earthengine/assets/RGB/001/2026_REDB_6`. Same flight.
+- **Config:** `MODE = 'matrix'`, `STAGING = false`, `REG_VERSIONS = ['REG']`, forms `ING`, `REG`, `REG_TILES`; `op` `stats`; regions 1, 3 and 5 km squares at the anchor above (4, 16 and 35 tiles touched); scales 1, 10, 32, 63, 100 m; 3 reps; `EXTENT_OVERRIDE = {lon: -111.780094, lat: 40.800975, shortSideM: 7000}`; run label `REDB_RGB_REG_run1`.
+- **Raw data:** `results_2026-11-04_RGB_REDB_REG_run1.csv` (135 rows, no errors; columns `site_year_reg`, `site_year_ing` and `source` added to each row by hand from the config above, since the harness did not write them yet; later runs write them).
+- **Run conditions:** nothing else running. A backend stall hit 3 km at 32 m rep 3 (ING 59.8 s, REG 60.2 s, REG_TILES 60.4 s, all three forms) and ING 3 km at 63 m rep 1 (42.0 s). Treat those rows as outliers; they inflate the 3 km @32 m medians below (marked *).
+
+Median wall-clock (s), ING / REG@REG (mosaic of touched tiles) / REG_TILES@REG (no mosaic); ratio to ING in brackets where it is meaningful:
+
+| Region (tiles) | Scale | ING | REG | REG_TILES |
+|---|---|---|---|---|
+| 1 km (4) | 1 m | 1.2 | 1.5 (1.2x) | 0.3 (0.3x) |
+| 1 km (4) | 10 m | 0.3 | 0.4 (1.6x) | 0.4 (1.5x) |
+| 1 km (4) | 32 m | 0.3 | 0.4 | 0.5 |
+| 1 km (4) | 63 m | 1.1 | 0.5 | 0.8 |
+| 1 km (4) | 100 m | 0.4 | 0.3 | 0.4 |
+| 3 km (16) | 1 m | 4.2 | 3.5 (0.8x) | 3.2 (0.8x) |
+| 3 km (16) | 10 m | 0.4 | 1.2 (2.8x) | 1.0 (2.3x) |
+| 3 km (16) | 32 m | 9.7* | 2.8* | 4.2* |
+| 3 km (16) | 63 m | 0.3 | 0.4 | 0.9 |
+| 3 km (16) | 100 m | 0.3 | 0.3 | 0.7 |
+| 5 km (35) | 1 m | 3.0 | 4.7 (1.6x) | 1.6 (0.5x) |
+| 5 km (35) | 10 m | 0.4 | 1.9 (4.8x) | 0.8 (2.1x) |
+| 5 km (35) | 32 m | 0.2 | 0.4 | 1.3 |
+| 5 km (35) | 63 m | 0.2 | 0.4 | 1.2 |
+| 5 km (35) | 100 m | 0.2 | 0.4 | 1.2 |
+
+- **Wall-clock is close for a small site.** Differences are mostly under 2 s in absolute terms. The clearest registered penalty is at 10 m over 3 to 5 km (REG 1.2 s and 1.9 s against 0.4 s for ING; ranges do not overlap at 5 km). `REG_TILES` is the fastest registered form at 1 m and about 2x ING at 10 m. This is consistent with cost following the number of tiles touched: the largest REDB region (35 tiles) costs far less than the JERC 9 km (100 tiles) and 20 km (356 tiles) cases. EECU was not measured.
+- **Mean agrees with the 1 m mean better for registered than for ingested.** Percentage difference of the mean from the 1 m mean (same region, same form's 1 m result; registered and ingested agree at 1 m to better than 0.01%):
+
+| Scale | 1 km: ING | 1 km: REG | 5 km: ING | 5 km: REG |
+|---|---|---|---|---|
+| 10 m | +0.42% | +0.19% | +0.44% | +0.18% |
+| 32 m | +0.79% | -0.22% | +0.74% | +0.35% |
+| 63 m | +1.05% | -0.44% | +0.86% | +0.40% |
+| 100 m | +0.67% | +0.28% | +0.88% | +0.28% |
+
+  The "registered is 0.2% to 1.5% lower than ingested" in the run's own table is therefore mostly ingested drifting upward at coarse scales (up to +1.1%), not a registered bias. The 1 m result is itself read from an overview, so a native-scale (0.1 m) reference would be stricter; not run.
+- **Standard deviation and maximum.** Registered SD is 3% to 5% lower than ING at 10 m but 5% to 15% higher at 63 and 100 m (1 km at 100 m: +14.6%; 5 km at 100 m: +8.7%). Registered SD stops falling above 32 m (5 km: 16.2 at 32, 63 and 100 m; ING 16.5, 15.2, 14.9), which is consistent with the registered overviews ending at the 63 m level, so a 100 m request reads that level. Maximum: 5 km at 10 m REG 207 vs ING 183 (+13%) and at 32 m REG 213 vs ING 160 (+33%); the 1 km and 3 km regions agree within 3%. The 5 km maximum has not been located; possibly a bright object or an edge pixel.
+- **REG_TILES vs REG:** same results to within about 0.02% for the mean at 1 m, and 0.1% to 0.5% apart at coarse scales (for example 1 km at 63 m: 88.55 vs 88.99), because the per-tile reductions sample each tile's overview grid separately.
+- **Earlier RGB overview check (inventory v2, first `REDB` tile only, band 1 mean, `2026_REDB_6`):** registered vs ingested 78.05 vs 78.01 at 1 m, 78.53 vs 78.41 at 4 m, 79.45 vs 77.89 at 8 m, 78.79 vs 79.49 at 16 m, 80.80 vs 77.66 at 32 m, 76.72 vs 77.57 at 63 m. One tile, few pixels at the coarse scales; consistent with run 12 but not conclusive on its own.
+
+### Profiler runs, REDB (2026-11-04): EECU-seconds, RGB `stats`, 5 km, 10 m, anchor [-111.780094, 40.800975]
+
+- **Site-year and files:** registered `projects/neon-nonprod-earthengine/assets/RGB/REG` filtered on `YEAR_SITE_VISIT = 2026_REDB_6` (35 of 46 tiles touched); ingested `projects/neon-prod-earthengine/assets/RGB/001/2026_REDB_6`. Harness `MODE = 'single'`, `STAGING = false`, `REG_VERSIONS = ['REG']`, one run per form, Profiler on, nothing else running, no repeats. Results are the same as in run 12 (G mean 85.628 ING, 85.405 REG, 85.412 REG_TILES; SD 19.880, 19.222, 19.226).
+- Totals are the sum of the Profiler rows (the Profiler lists rows, not a total), added by hand.
+
+| Form | EECU·s | Main rows | Runs per 150 EECU-hours (540,000 EECU·s) |
+|---|---|---|---|
+| ING | about 0.46 | `Image.reduceRegion` 0.352, loading the image 0.089, plumbing 0.023 | about 1.2 million |
+| REG (mosaic of 35 tiles) | about 5.0 | `ImageCollection.mosaic` 3.564 (72%), `Image.reduceRegion` 0.685, 35 tile loads about 0.65 (0.018 each, 4 loads per tile), plumbing 0.057 | about 108,000 |
+| REG_TILES (first lean implementation, server-side combination) | about 3.9 (repeat 4.1) | plumbing 2.687 (44,907 operations), `Image.reduceRegion` 0.629 (1,961 calls), 35 tile loads about 0.55 (6 loads per tile), `AggregationContainer` 0.034 | about 137,000 |
+| REG_TILES (client-side combination, `TILES_CLIENT_COMBINE`) | about 1.6 | `Image.reduceRegion` 0.541, plumbing 0.507, 35 tile loads about 0.50 | about 340,000 |
+
+- **Registered costs about 11x ingested in compute (REG) and about 8x (REG_TILES) at 5 km, against 5x in wall-clock time (run 12).** Wall-clock closeness hides a real compute gap, as on JERC.
+- **Cost per tile touched:** REG 0.14 EECU·s per tile at 35 tiles (REDB), about 0.25 at 100 tiles (JERC 9 km, `901`) and about 0.48 at 356 tiles (JERC 20 km, `900`); REG_TILES about 0.11 per tile here and about 0.097 at 356 tiles (first implementation, run 7 Profiler). So the mosaic grows faster than linearly with the tile count while per-tile reduction stays roughly linear. Different sites, versions and tile counts, one measurement each; indicative only.
+- **Per-tile asset load cost:** about 4.6 ms per load on the current `RGB/REG` tiles (REG: 4 loads per tile at 0.018 EECU·s per tile), about the same as `901` (3.8 ms per load) and about 30x `900` (0.14 ms). The tile metadata that makes the difference has not been identified (open question in the handoff).
+- **Repeat of the old REG_TILES (second run, same script, same region):** about 4.1 EECU·s (plumbing 2.828 over 44,903 operations, `Image.reduceRegion` 0.678 over 1,961 calls, tile loads about 0.55) against about 3.9 for the first run: about 5% apart. This is the only EECU repeatability measurement so far (identical code, back to back). The operation counts are identical in both runs.
+- **The REG_TILES cost is probably mostly implementation, not the pattern.** There are 1,576 `Image.select` calls = 35 tiles x 45, and 1,961 `reduceRegion` calls = 35 x 56, so the per-tile reduction runs about 45 to 56 times per tile, while the pixels are read only 6 times per tile (210 `Reprojecting pixels` rows). The old per-tile function reads the reduction's dictionary 15 times (`val()` for 3 bands x 5 statistics), each reading it three times; 15 x 3 = 45 matches. **My first diagnosis (about 45 re-evaluations from `aggregate_*` calls) was wrong:** there are only about 16 aggregation calls, and the counts do not scale with them. Inference from the counts, not tested.
+- **Fix (`TILES_CLIENT_COMBINE = true`), re-profiled 2026-11-04, same region, single run, new script confirmed (no `AggregateFeatureCollection` rows): about 1.6 EECU·s, down from 3.9 to 4.1 (about 60% less), result identical to the old version to all printed digits (G mean 85.41156917422585, G SD 19.225717015124538, `n` 240255).** Each tile's single `reduceRegion` becomes the properties of a feature and the combination (count-weighted mean, pooled variance, min, max) is done in the browser by `combineTiles`. Rows: `Image.reduceRegion` 0.541 (491 calls), plumbing 0.507 (1,994 operations, was 44,903), 35 tile loads about 0.50 (6 loads per tile), reprojecting 0.014, aggregation container 0.010, `Image.select` 0.004 (106 calls, was 1,576). That is about 3x cheaper than the mosaic (5.0) and about 3.4x the ingested 0.46, at 0.045 EECU·s per tile. The earlier diagnosis (per-tile reduction repeated about 45 times because `val()` reads the dictionary 15 x 3 times) is supported. The wall-clock REG_TILES timings in run 12 were measured with the old implementation; the new one has not been timed.
+- **Rough extrapolation, not measured:** at 0.045 EECU·s per tile, a 356-tile query (JERC 20 km) would be about 16 EECU·s, against about 171 (mosaic) and about 6.5 (ingested). The registered tiles in `900` load about 30x cheaper than the current `RGB/REG` tiles (0.14 vs 4.6 ms per load), so the real figure could differ.
+- **Operational note:** edits to the script file on disk do not reach the Code Editor; the whole script has to be pasted in again after every change. The second profile above was the old script (the Profiler still showed the `AggregateFeatureCollection` rows the new code does not call).
+- **Not yet done:** repeats of REG and ING for spread, a smaller region (1 km, 4 tiles), and the re-profile of the new `REG_TILES`.
+
+### Render profiles, REDB (2026-11-04): EECU-seconds to draw one map view, RGB, zoom 13, anchor [-111.780094, 40.800975]
+
+- **Site-year and files:** `2026_REDB_6`; ingested `projects/neon-prod-earthengine/assets/RGB/001/2026_REDB_6` (`ING`) and registered `projects/neon-nonprod-earthengine/assets/RGB/REG` filtered on `YEAR_SITE_VISIT = 2026_REDB_6`, all 46 tiles mosaicked and clipped to the tile bounds (`REG_FULL@REG`, the viewer's construction). Harness `MODE = 'single'`, `op: 'render'`, bands R, G, B with min 40, max 200, gamma 0.65, Profiler on, one run each, same browser window (size not recorded), no panning or zooming. Totals are sums of the Profiler rows, added by hand.
+- **The Profiler does record map tiles**, and its table keeps accumulating while tiles are still being drawn: the first ING paste (14 tiles encoded) was 1.11 EECU·s and the finished view (21 tiles) was 1.58; the first REG_FULL paste (14 tiles) was about 3.7 and the finished view (21 tiles) 4.53. Only the 21-tile tables are comparable. The user noted a complete image appears on screen well before the Profiler counts stop, so the on-screen look is not a guide to when to copy the table.
+
+| 21 map tiles | ING | REG_FULL@REG |
+|---|---|---|
+| Total EECU·s | about 1.58 | about 4.53 |
+| `ImageCollection.mosaic` | none | 1.961 (43%) |
+| Tile asset loading (46 tiles, about 7 loads each per map tile) | 0.084 (one image) | 1.185 (26%) |
+| `Encoding pixels to image` | 0.758 | 0.644 |
+| Reprojection precalculation | 0.518 (21) | 0.176 (8) |
+| Plumbing | 0.195 | 0.502 |
+| Initial views per 150 EECU-hours (540,000 EECU·s) | about 340,000 | about 119,000 |
+
+- **Registered costs about 2.9x ingested to draw the same view** (about 0.075 vs about 0.22 EECU·s per map tile). The gap is the mosaic plus the tile loads (about 3.1 EECU·s together); the encoding and reprojection steps are slightly cheaper for the registered data. Smaller than the 11x seen for `reduceRegion` statistics, but it applies to every map view in the viewer, including panning and zooming.
+- **Why the loads are high:** the viewer's construction mosaics the whole site-year (46 tiles) for every map tile, so the 46 asset records are read many times. `REG@REG` (mosaic only the tiles touching the view) was not profiled, so how much of this is avoidable is not known.
+- **Not measured:** CHM or DEM rendering, other zoom levels, other window sizes, wall-clock draw time, JERC (356 tiles, where the mosaic cost per tile is higher), repeats for spread.
+
+### Run 13 (2026-11-04): reflectance, `2026_REDB_6`, band-interleaved vs pixel-interleaved vs ingested; TIMINGS INVALID
+
+- **Site-year and files:** registered `projects/neon-nonprod-earthengine/assets/REFL/REG` (BAND) and `.../testREFL/PIX` (PIX), both selected with `AOP_ID = 2026_REDB_6` (50 tiles each); ingested `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6` (ING, first 426 bands used). Script `cog_refl_perf_test.js` (first version).
+- **Run conditions:** the script was started **twice at the same time** (two complete interleaved progress logs and two summaries, run labels 16:02 and 16:03 UTC), so all timings are contaminated. The raw output was not saved. The script now prints a run id on every progress line and writes site-year, source and `tile_scale` columns to the CSV.
+- **What still holds:**
+  - ING, BAND and PIX agree to about 15 digits at 1 m (for example B053 mean over 1 km 344.984; NDVI 0.843962). At 10 m they differ by up to about 0.1%, and BAND and PIX differ slightly from each other, so their overviews were built differently.
+  - BAND failed with "User memory limit exceeded" for all 426 bands over 1 km at 1 m, and for 1000 random pixels (all bands) over 3 km, in both overlapping runs. PIX and ING completed both.
+  - Hypothesis not supported yet: PIX was not faster than BAND for 50 bands, and 1000 random pixels with all bands over 1 km took roughly 12 to 31 s (BAND) and 19 to 137 s (PIX) against 2 to 3 s (ING). Small cases (3 to 10 bands, one spectrum, NDVI) were all within about a second or two of each other.
+- **To do:** clean rerun (one copy only, reload the tab first, `REPS = 3`), split into light and heavy operations, and try `TILE_SCALE = 4` for the memory failures; then single-mode Profiler runs for the key cases.
+
+### Run 14 (2026-11-04): reflectance, light operations, `2026_REDB_6`, clean run (replaces the wall-clock part of run 13)
+
+- **Site-year and files:** `2026_REDB_6`. `ING` = `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6` (first 426 bands B001-B426 used; 442 in the image); `BAND` = `projects/neon-nonprod-earthengine/assets/REFL/REG` and `PIX` = `projects/neon-nonprod-earthengine/assets/testREFL/PIX`, both tiles selected with `AOP_ID = 2026_REDB_6` (50 tiles, mosaicked). Script `cog_refl_perf_test.js` (version with run id and `TILE_SCALE`), run id `i74l`, label `REDB_REFL_light_run1`.
+- **Config:** matrix mode, one request at a time, 126 requests = 14 case groups x 3 forms x 3 reps; operations `bands3`, `bands50`, `ndvi` (B096 and B056), `spec_point` (all 426 bands at the anchor, 1 m), `spec_poly` (all 426 bands over 100 m x 100 m at 1 m); regions 1 and 3 km at anchor [-111.780094, 40.800975]; scales 1 and 10 m; `TILE_SCALE = 1`. `bands10`, `bandsAll` and `points` were not in this run (see run 15). Profiler off (not needed for wall-clock).
+- **Conditions:** one run id (`i74l`) in all 126 progress lines, no errors. Raw data: `results_2026-11-04_REFL_REDB_light_run1.csv` (126 rows, columns include `site_year_reg`, `site_year_ing`, `source`, `tile_scale`; saved from the console text the user pasted, the summary and progress lines are not saved).
+- **Values agree.** At 1 m all three forms give identical means (for example B053 over 1 km 366.157; NDVI 0.830043; one spectrum value 1045; spectrum-polygon B001 890.941). At 10 m the registered forms are within -0.11% to +0.09% of ingested (PIX closer: within 0.03% except NDVI 3 km +0.09%; BAND -0.03% to -0.11% for the band means). BAND and PIX differ slightly from each other at 10 m although they hold the same pixels, so their overviews were built differently. These differences are much smaller than for RGB (up to about 1% at coarse scales).
+
+Median wall-clock (s), fastest-slowest in the CSV; ratio to ING in brackets:
+
+| Operation | ING | BAND | PIX |
+|---|---|---|---|
+| `bands3` 1 km, 1 m | 0.6 | 0.9 (1.5x) | 0.9 (1.4x) |
+| `bands3` 1 km, 10 m | 0.3 | 0.5 (1.7x) | 0.5 (1.6x) |
+| `bands3` 3 km, 1 m | 1.3 | 2.9 (2.3x) | 2.1 (1.7x) |
+| `bands3` 3 km, 10 m | 0.5 | 0.4 (0.8x) | 1.1 (2.3x) |
+| `bands50` 1 km, 1 m | 8.7 | 7.8 (0.9x) | 9.5 (1.1x) |
+| `bands50` 1 km, 10 m | 0.4 | 1.0 (2.7x) | 0.9 (2.3x) |
+| `bands50` 3 km, 1 m | 14.9 | 8.2 (0.6x) | 9.4 (0.6x) |
+| `bands50` 3 km, 10 m | 1.4 | 1.7 (1.2x) | 2.1 (1.5x) |
+| `ndvi` 1 km, 1 m | 0.7 | 1.2 (1.7x) | 1.4 (1.8x) |
+| `ndvi` 1 km, 10 m | 0.8 | 0.6 (0.8x) | 0.9 (1.2x) |
+| `ndvi` 3 km, 1 m | 1.2 | 2.9 (2.5x) | 2.1 (1.8x) |
+| `ndvi` 3 km, 10 m | 0.5 | 1.3 (2.5x) | 0.5 (1.1x) |
+| `spec_point` | 0.6 | 1.5 (2.5x) | 1.1 (1.9x) |
+| `spec_poly` | 1.0 | 1.7 (1.8x) | 1.9 (1.9x) |
+
+- **Light operations cost a second or two in every form.** Registered is typically 1.5x to 2.5x ingested in the small cases (an absolute difference of about 1 s or less), and about 0.6x ingested for 50 bands over 3 km at 1 m (8 to 9 s vs 15 s). With only 3 repeats, ratios under about 1.5x are not meaningful.
+- **No consistent winner between the layouts.** The expectation that pixel-interleaved wins for many bands or spectra and band-interleaved for few bands is **not supported** at these sizes: `bands3` is about equal (0.9 vs 0.9 s at 1 km; BAND 2.9 vs PIX 2.1 s at 3 km, but 0.4 vs 1.1 s at 3 km and 10 m), `bands50` is about equal, and `spec_point` is 1.5 (BAND) vs 1.1 s (PIX) with overlapping ranges.
+- **Outliers:** `bands50` 1 km at 1 m, repeat 3: PIX 68.8 s, BAND 35.3 s, ING 6.3 s (the other repeats were 4.5 to 10.5 s for all forms). Probably a transient backend slowdown, but it hit the two registered forms and not ING.
+- **Not covered here:** the heavy cases where BAND failed with "User memory limit exceeded" in run 13 (all 426 bands over 1 km at 1 m; 1000 random pixels over 3 km); see run 15. EECU not measured for reflectance yet.
 
 ### Profiler runs (2026-11-03): EECU-seconds, RGB `stats`, 9 km, 10 m, anchor [-84.469531, 31.240337]
 

@@ -2,8 +2,9 @@
     // National Ecological Observatory Network, Battelle
     // AOP Earth Engine Data Viewer app - desktop version
     // TEST BUILD (based on 11G): RGB, CHM and DEM (DSM/DTM/Derived Terrain) read from registered
-    // COG tile collections (nonprod, test*/REG) and are mosaicked per site-year; HSI/CNC remain ingested.
-    // Only 2026_JERC_9 and 2025_HOPB_6 currently exist as registered data.
+    // COG tile collections (nonprod, {RGB|CHM|DEM}/REG) and are mosaicked per site-year; HSI/CNC remain ingested.
+    // Only 2026_JERC_9 and 2026_REDB_6 currently exist as registered data in these collections
+    // (2025_HOPB_6 exists only in the older test{RGB|CHM|DEM}/REG collections: set COG_STAGING = true to view it).
 
     // Initialize the map with a default center and zoom level
     Map.setCenter(-95.7129, 37.0902, 4); // Centered over the USA
@@ -67,10 +68,12 @@
     // tagged with YEAR_SITE_VISIT (e.g. '2026_JERC_9'). A site-year "image" is built by
     // filtering on YEAR_SITE_VISIT and mosaicking (see getCogImage). Ingested collections
     // (HSI, CNC) still hold one mosaic image per site-year, indexed by system:index.
-    // TEST: registered collections live in the non-prod project as test{PRODUCT}/REG.
-    // For production, point COG_ROOT at the prod project and set COG_STAGING = false.
+    // TEST: registered collections live in the non-prod project. COG_STAGING = false reads
+    // {PRODUCT}/REG (2026_JERC_9 + 2026_REDB_6, semi-final build, as of 2026-11-04); COG_STAGING = true reads the
+    // older test{PRODUCT}/REG (2025_HOPB_6 + 2026_JERC_9, capped/aligned overviews).
+    // For production, point COG_ROOT at the prod project (and confirm which build the data team finalises).
     var COG_ROOT = 'projects/neon-nonprod-earthengine/assets';
-    var COG_STAGING = true;
+    var COG_STAGING = false;
     var COG_VERSION = 'REG';
     var COG_SITE_PROP = 'YEAR_SITE_VISIT';
 

@@ -1,0 +1,127 @@
+run,form,op,size_km,scale_m,rep,seconds,ok,value,error,site_year_reg,site_year_ing,source,tile_scale
+REDB_REFL_light_run1 #i74l,ING,bands3,1,1,1,0.65,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,1,1,0.77,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,1,1,1.91,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,1,10,1,0.29,true,366.2043646946243,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,10,1,0.50,true,365.9920138511184,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,10,1,0.48,true,366.22381238402903,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,1,1,1.06,true,393.3282671144877,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,1,1,2.94,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,1,1,5.93,true,393.3282671144875,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,10,1,0.54,true,393.4074193606442,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,10,1,0.98,true,392.9824585872514,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,10,1,1.09,true,393.28851523848186,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,1,1,8.69,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,1,1,7.77,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,1,1,4.47,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,10,1,0.35,true,810.579837447207,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,10,1,1.10,true,810.327974025606,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,10,1,1.29,true,810.7751963923401,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,1,1,13.62,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,1,1,22.39,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,1,1,9.35,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,10,1,1.87,true,813.9747338653516,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,10,1,1.98,true,813.5830037463361,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,10,1,2.09,true,813.9387112915995,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,1,1,0.75,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,1,1,1.23,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,1,1,1.36,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,10,1,0.27,true,0.8291100229439111,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,10,1,0.62,true,0.8292056370866969,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,10,1,0.92,true,0.8290101526545787,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,1,1,1.53,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,1,1,2.92,true,0.8163416921884393,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,1,1,2.08,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,10,1,0.39,true,0.8119427418095774,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,10,1,1.58,true,0.8119533410278825,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,10,1,1.11,true,0.812654261723235,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_point,0,1,1,0.35,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_point,0,1,1,1.35,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_point,0,1,1,1.19,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_poly,0,1,1,1.37,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_poly,0,1,1,1.72,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_poly,0,1,1,1.21,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,1,2,2.00,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,1,2,0.93,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,1,1,2,1.01,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,10,2,0.22,true,365.9920138511184,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,10,2,0.95,true,366.22381238402903,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,1,10,2,0.71,true,366.2043646946243,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,1,2,2.93,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,1,2,2.09,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,1,2,1.25,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,10,2,0.37,true,392.9824585872514,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,10,2,0.85,true,393.28851523848186,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,10,2,0.49,true,393.4074193606442,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,1,2,6.94,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,1,2,9.47,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,1,2,10.46,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,10,2,1.03,true,810.327974025606,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,10,2,0.82,true,810.7751963923401,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,10,2,0.52,true,810.579837447207,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,1,2,8.23,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,1,2,8.38,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,1,2,14.89,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,10,2,0.49,true,813.5830037463361,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,10,2,1.95,true,813.9387112915995,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,10,2,1.22,true,813.9747338653516,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,1,2,2.10,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,1,2,1.42,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,1,2,0.33,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,10,2,0.53,true,0.8292056370866969,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,10,2,1.00,true,0.8290101526545787,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,10,2,0.85,true,0.8291100229439111,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,1,2,3.60,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,1,2,1.70,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,1,2,1.13,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,10,2,0.69,true,0.8119533410278825,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,10,2,0.43,true,0.812654261723235,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,10,2,0.50,true,0.8119427418095774,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_point,0,1,2,1.78,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_point,0,1,2,0.27,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_point,0,1,2,1.00,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_poly,0,1,2,1.42,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_poly,0,1,2,2.59,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_poly,0,1,2,0.97,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,1,3,0.63,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,1,1,3,0.42,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,1,3,0.94,true,366.15681271339406,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,1,10,3,0.27,true,366.22381238402903,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,1,10,3,0.23,true,366.2043646946243,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,1,10,3,0.60,true,365.9920138511184,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,1,3,1.25,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,1,3,1.76,true,393.3282671144876,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,1,3,1.55,true,393.32826711448763,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands3,3,10,3,1.51,true,393.28851523848186,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands3,3,10,3,0.30,true,393.4074193606442,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands3,3,10,3,0.33,true,392.9824585872514,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,1,3,68.81,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,1,3,6.26,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,1,3,35.31,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,1,10,3,0.88,true,810.7751963923401,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,1,10,3,0.38,true,810.579837447207,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,1,10,3,0.68,true,810.327974025606,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,1,3,12.53,true,813.783696965884,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,1,3,16.56,true,813.783696965884,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,1,3,7.78,true,813.7836969658841,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,bands50,3,10,3,3.28,true,813.9387112915995,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,bands50,3,10,3,1.42,true,813.9747338653516,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,bands50,3,10,3,1.67,true,813.5830037463361,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,1,3,0.74,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,1,3,0.93,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,1,3,1.15,true,0.8300425913356467,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,1,10,3,0.70,true,0.8290101526545787,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,1,10,3,0.80,true,0.8291100229439111,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,1,10,3,0.96,true,0.8292056370866969,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,1,3,3.27,true,0.8163416921884392,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,1,3,1.19,true,0.8163416921884393,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,1,3,2.00,true,0.8163416921884393,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,ndvi,3,10,3,0.53,true,0.812654261723235,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,ndvi,3,10,3,1.09,true,0.8119427418095774,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,ndvi,3,10,3,1.26,true,0.8119533410278825,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_point,0,1,3,1.11,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_point,0,1,3,0.59,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_point,0,1,3,1.47,true,1045,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,PIX,spec_poly,0,1,3,1.86,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_light_run1 #i74l,ING,spec_poly,0,1,3,0.74,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_light_run1 #i74l,BAND,spec_poly,0,1,3,2.10,true,890.940669602634,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1

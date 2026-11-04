@@ -61,6 +61,11 @@ var SCALES = {                            // reduction scales in metres for the 
   DSM: [1, 10, 100],
   DTM: [1, 10, 100]
 };
+var EXTENT_OVERRIDE = null;               // {lon, lat, shortSideM}: use this centre and footprint short side for every form and skip the
+                                          // footprint lookup, which can take very long (it unions every tile footprint). Get the numbers from
+                                          // cog_redb_anchor.js. MODE 'centres' then just echoes them.
+var TILES_CLIENT_COMBINE = true;          // REG_TILES: one reduceRegion per tile, results combined in the browser (see tilesStats and combineTiles).
+                                          // false = the earlier server-side combination (about 3.9 to 4.1 EECU-s at REDB 5 km). UNTESTED until run.
 var REPS = 5;                             // the form order is rotated each repeat to spread first-read (cold) costs
 var BUST_CACHE = true;
 var MAX_PIXELS = 5e8;                     // skip scale-dependent cases covering more pixels than this
@@ -218,6 +223,16 @@ function tilesStats(product, version, region, scale, salt) {
     .combine({reducer2: ee.Reducer.mean(), sharedInputs: true})
     .combine({reducer2: ee.Reducer.variance(), sharedInputs: true})
     .combine({reducer2: ee.Reducer.minMax(), sharedInputs: true});
+  if (TILES_CLIENT_COMBINE) {
+    // One reduceRegion per tile; its dictionary becomes the feature's properties and is referenced once.
+    // The Profiler (REDB 5 km, 35 tiles, 2026-11-04) showed the version below running the reduction about
+    // 45 times per tile (1,576 Image.select calls = 35 x 45), because the dictionary is referenced 15 times.
+    return ee.FeatureCollection(tiles.map(function(tile) {
+      return ee.Feature(null, ee.Image(tile).select(p.bands).reduceRegion({
+        reducer: reducer, geometry: region, scale: scale, maxPixels: 1e13
+      }));
+    }));
+  }
   // With a combined reducer the outputs are always prefixed with the band name, also for a single-band
   // image (CHM_count, CHM_mean, ...). The first version of this function assumed unsuffixed names for
   // single-band products and, because of the default values below, silently returned zeros for CHM.
@@ -260,6 +275,36 @@ function tilesStats(product, version, region, scale, salt) {
   // Total pixel count of the first band; a count of 0 means nothing was read (see runCase).
   out.n = ee.Number(perTile.aggregate_sum(p.bands[0] + '_n'));
   return ee.Dictionary(out);
+}
+
+// Client-side combination of the per-tile feature collection returned by tilesStats when
+// TILES_CLIENT_COMBINE is true. Same formulas as the server-side version above, same output keys.
+function combineTiles(info, product) {
+  var p = PRODUCTS[product];
+  var feats = (info && info.features) || [];
+  var out = {};
+  p.bands.forEach(function(b, bi) {
+    var n = 0, nm = 0, nss = 0, mn = Infinity, mx = -Infinity;
+    feats.forEach(function(f) {
+      var q = f.properties || {};
+      var c = q[b + '_count'];
+      if (typeof c !== 'number' || c <= 0) return;      // tile with no pixels in the region
+      var m = q[b + '_mean'], v = q[b + '_variance'];
+      n += c;
+      nm += c * m;
+      nss += c * (v + m * m);
+      if (q[b + '_min'] < mn) mn = q[b + '_min'];
+      if (q[b + '_max'] > mx) mx = q[b + '_max'];
+    });
+    var mean = nm / n;
+    var k = p.bands.length > 1 ? b + '_' : '';
+    out[k + 'mean'] = mean;
+    out[k + 'stdDev'] = Math.sqrt(Math.max(0, nss / n - mean * mean));
+    out[k + 'min'] = mn;
+    out[k + 'max'] = mx;
+    if (bi === 0) out.n = n;
+  });
+  return out;
 }
 
 // ----------------------------------------------------------------------------
@@ -369,7 +414,9 @@ function csvCell(v) {
 }
 
 // value = mean of the check band; std, min and max are filled for 'stats' (math and focal give std only).
-var CSV_COLS = ['run', 'form', 'product', 'op', 'size_km', 'scale_m', 'rep', 'tiles', 'ms', 'status', 'value', 'std', 'min', 'max', 'note'];
+// site_year_reg, site_year_ing and source say which site-year and which collection/image each row read.
+var CSV_COLS = ['run', 'form', 'product', 'op', 'size_km', 'scale_m', 'rep', 'tiles', 'ms', 'status', 'value', 'std', 'min', 'max', 'note',
+                'site_year_reg', 'site_year_ing', 'source'];
 
 function toCsv(rows) {
   var lines = [CSV_COLS.join(',')];
@@ -473,6 +520,7 @@ function runCase(c, done) {
     var t0 = Date.now();
     obj.evaluate(function(res, err) {
       var ms = Date.now() - t0;
+      if (!err && f.kind === 'REG_TILES' && TILES_CLIENT_COMBINE) res = combineTiles(res, c.product);
       if (!err && f.kind === 'REG_TILES' && !(res && res.n > 0)) err = 'REG_TILES counted no pixels';
       done({
         run: runLabel, form: c.form, product: c.product, op: c.op, size_km: c.size_km, scale_m: c.scale_m,
@@ -481,7 +529,12 @@ function runCase(c, done) {
         std: err ? '' : pickStat(res, c.product, 'stdDev'),
         min: err ? '' : pickStat(res, c.product, 'min'),
         max: err ? '' : pickStat(res, c.product, 'max'),
-        note: err || ''
+        note: err || '',
+        site_year_reg: REG_ID,
+        site_year_ing: ING_ID,
+        source: f.kind === 'ING'
+          ? ingPath(PRODUCTS[c.product].folder) + '/' + ING_ID
+          : regPath(PRODUCTS[c.product].folder, f.version) + ' (' + SITE_PROP + '=' + REG_ID + ')'
       });
     });
   });
@@ -593,7 +646,17 @@ function runSingle() {
   var scale = op.native ? PRODUCTS[s.product].native : s.scale;
   if (f.kind === 'REG_TILES') {
     if (s.op !== 'stats') { print('REG_TILES supports only op "stats".'); return; }
-    print('Result', tilesStats(s.product, f.version, region, scale, salt));
+    var tr = tilesStats(s.product, f.version, region, scale, salt);
+    if (TILES_CLIENT_COMBINE) {
+      // evaluate() is used (not print) because the per-tile collection has to be combined in the browser.
+      // It is started from the script run itself, so the Profiler should record it like the other cases;
+      // if the Profiler table comes back empty, change this to print('Per-tile statistics', tr).
+      tr.evaluate(function(info, e) {
+        print('Result', e ? 'ERROR ' + e : combineTiles(info, s.product));
+      });
+    } else {
+      print('Result', tr);
+    }
     return;
   }
   var img = getImage(s.form, s.product, region, salt);
@@ -603,6 +666,20 @@ function runSingle() {
 // ----------------------------------------------------------------------------
 // Startup: check the site-years exist, find dataset extents, then run
 // ----------------------------------------------------------------------------
+// Prints the centres and starts the matrix (unless MODE is 'centres').
+function finishStartup(extents) {
+  var lines = Object.keys(extents).map(function(k) {
+    var e = extents[k];
+    return k + ': [' + e.lon.toFixed(6) + ', ' + e.lat.toFixed(6) + '], shorter side ' + Math.round(e.shortSideM) + ' m';
+  });
+  print('Dataset centres [lon, lat] (paste one into SINGLE.anchor) and shorter footprint sides:', lines.join('\n'));
+  if (MODE === 'centres') return;
+  runMatrix(extents);
+}
+
+var startupT0 = Date.now();
+function stamp(label) { print(label + ' (' + ((Date.now() - startupT0) / 1000).toFixed(1) + ' s since start)'); }
+
 if (MODE === 'single') {
   runSingle();
 } else {
@@ -641,6 +718,19 @@ if (MODE === 'single') {
     }
     if (missing) return;
     print('Tiles per product folder and version (ING = 1 image):', n);
+    stamp('Existence check done');
+
+    if (EXTENT_OVERRIDE) {
+      var ov = {};
+      folders.forEach(function(folder) {
+        ov['ING|' + folder] = EXTENT_OVERRIDE;
+        REG_VERSIONS.forEach(function(v) { ov['REG@' + v + '|' + folder] = EXTENT_OVERRIDE; });
+      });
+      print('Using EXTENT_OVERRIDE; footprint lookup skipped.');
+      finishStartup(ov);
+      return;
+    }
+    print('Looking up footprints (unions every tile footprint; slow for large collections, see EXTENT_OVERRIDE)...');
 
     var bounds = {};
     folders.forEach(function(folder) {
@@ -652,15 +742,10 @@ if (MODE === 'single') {
     });
     ee.Dictionary(bounds).evaluate(function(b, err2) {
       if (err2) { print('Footprint lookup failed:', err2); return; }
+      stamp('Footprint lookup done');
       var extents = {};
       Object.keys(b).forEach(function(k) { extents[k] = describeExtent(b[k]); });
-      var lines = Object.keys(extents).map(function(k) {
-        var e = extents[k];
-        return k + ': [' + e.lon.toFixed(6) + ', ' + e.lat.toFixed(6) + '], shorter side ' + Math.round(e.shortSideM) + ' m';
-      });
-      print('Dataset centres [lon, lat] (paste one into SINGLE.anchor) and shorter footprint sides:', lines.join('\n'));
-      if (MODE === 'centres') return;
-      runMatrix(extents);
+      finishStartup(extents);
     });
   });
 }
