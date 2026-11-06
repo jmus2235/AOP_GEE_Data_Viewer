@@ -1,0 +1,19 @@
+run,form,op,size_km,scale_m,rep,seconds,ok,value,error,site_year_reg,site_year_ing,source,tile_scale
+REDB_REFL_heavy_ts1 #2ukp,ING,bandsAll,1,1,1,101.44,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_heavy_ts1 #2ukp,BAND,bandsAll,1,1,1,17.29,false,,User memory limit exceeded.,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,bandsAll,1,1,1,223.40,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,ING,points,1,1,1,1.92,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_heavy_ts1 #2ukp,BAND,points,1,1,1,25.88,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,points,1,1,1,11.71,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,ING,points,3,1,1,17.22,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_heavy_ts1 #2ukp,BAND,points,3,1,1,25.69,false,,User memory limit exceeded.,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,points,3,1,1,49.07,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,BAND,bandsAll,1,1,2,17.97,false,,User memory limit exceeded.,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,bandsAll,1,1,2,55.58,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,ING,bandsAll,1,1,2,39.82,true,810.90149887483,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_heavy_ts1 #2ukp,BAND,points,1,1,2,15.31,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,points,1,1,2,25.42,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,ING,points,1,1,2,1.67,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1
+REDB_REFL_heavy_ts1 #2ukp,BAND,points,3,1,2,22.20,false,,User memory limit exceeded.,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,PIX,points,3,1,2,199.58,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6),1
+REDB_REFL_heavy_ts1 #2ukp,ING,points,3,1,2,16.79,true,1000,,2026_REDB_6,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6,1

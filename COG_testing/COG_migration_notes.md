@@ -2,11 +2,11 @@
 
 Working notes for moving the viewer from ingested images to registered COG tile collections.
 Test build: `Display_AOP_Image_Collections_app_11G_COG_test.js` (copy of 11G; 11G is unchanged).
-Last updated: 2026-11-04 (REDB test set, runs 12 and 13 added).
+Last updated: 2026-11-05 (reflectance, classification and REDB RGB runs 13 to 23 added to the run sections; the headline section below is not yet rewritten).
 
 ## Headline results and implications (as of 2026-11-03)
 
-Evidence is detailed in the run sections below. All timings come from one site-year (JERC 2026, ingested vs registered), products RGB, CHM and DTM, mostly `stats` over regions of 1 to 20 km. Profiler (EECU) numbers are single runs.
+Evidence is detailed in the run sections below. All timings come from one site-year (JERC 2026, ingested vs registered), products RGB, CHM and DTM, mostly `stats` over regions of 1 to 20 km. Profiler (EECU) numbers are single runs. The REDB runs (12 to 23) are in their own sections and are not yet reflected here.
 
 ### Headline results
 
@@ -19,7 +19,7 @@ Evidence is detailed in the run sections below. All timings come from one site-y
 
 7. **Per-tile reduction avoids most of the mosaic cost.** Reducing each tile separately and combining the results (`REG_TILES`, mean, standard deviation, minimum and maximum only) is 2x to 7x faster in wall-clock time than the mosaicked form (clean run 11: CHM 0.7 s at 9 km and 1.5 s at 20 km against 3.2 s and 10.1 s; RGB 2.7 s and 7.5 s against 7.5 s and 13.2 s), at 1.7x to 3.5x the ingested time (CHM about 1.7x to 1.8x, RGB 2.6x to 3.5x), and it did not hit the memory error the mosaic form hit once at 13 km. Its statistics agree with the mosaic (RGB and CHM means within 0.02%, standard deviations within 0.01%, minimum and maximum identical). In compute the first implementation cost about 34.6 EECU·s at 20 km (356 tiles) against about 171 for the mosaic and about 6.5 for ingested; the current leaner implementation is 2x to 4x slower in wall-clock time than that first one and its EECU has not been measured.
 
-8. **Second site (REDB 2026, RGB, paired; run 12, 2026-11-04).** On a small site (46 tiles) registered is close to ingested in wall-clock time (differences mostly under 2 s; registered up to about 2.8x to 4.8x slower at 10 m over 3 to 5 km, `REG_TILES` about 2x), and coarse-scale means stay within about 0.5% of the 1 m mean while the ingested overviews drift up to +1.1%. Registered standard deviation plateaus above about 32 m. EECU not measured; reflectance timings not yet valid (run 13). This section is not rewritten here; the end-of-testing lessons summary will pull the results together.
+8. **Second site (REDB 2026, RGB, paired; run 12, 2026-11-04).** On a small site (46 tiles) registered is close to ingested in wall-clock time (differences mostly under 2 s; registered up to about 2.8x to 4.8x slower at 10 m over 3 to 5 km, `REG_TILES` about 2x), and coarse-scale means stay within about 0.5% of the 1 m mean while the ingested overviews drift up to +1.1%. Registered standard deviation plateaus above about 32 m. (Later REDB results, including EECU, the new `REG_TILES`, map rendering, reflectance and classification, are in the run sections below, runs 12 to 23. This headline section is deliberately not rewritten until the optional runs are finished and the end-of-testing lessons summary pulls the results together.)
 
 ### Implications
 
@@ -47,7 +47,8 @@ Evidence is detailed in the run sections below. All timings come from one site-y
 ### Open questions
 - EECU cost of map-tile rendering in the viewer (use single mode with `op: 'render'`).
 - EECU of the leaner per-tile implementation (first version 34.6 EECU·s at 20 km, about 8 of it the squaring step), and whether it can be made faster in wall-clock time (it is 2x to 4x slower than the first version, probably because of the many small server operations per tile).
-- Behaviour on the largest site (GRSM) and with hyperspectral data (426 bands).
+- Behaviour on the largest site (GRSM). (Hyperspectral data with 426 bands: tested on REDB, runs 13 to 23.)
+- For the data owner (reflectance and classification): what differs in the pixel-interleaved tile asset records (their asset loads cost about 9x to 10x the band-interleaved ones; the same question as for `RGB/REG` against `900`); the interleave, internal block size, compression and overview levels of the band- and pixel-interleaved files (the band-interleaved form runs out of memory for all-band operations at the default `tileScale`); why the two layouts give slightly different 4 m to 10 m values (overview construction); whether overview cells built from partly masked pixels are valid in the registered tiles but masked in the ingested image (two more points kept at 4 m); whether the final tiles will carry `YEAR_SITE_VISIT` and, for the pixel-interleaved form, the wavelengths; why the ingested image has 442 bands against 426 (the 16 extras are QA bands).
 - Which project the viewer's compute is charged to, and its quota tier.
 - Run-to-run variability: partly answered by runs 6, 7 and 8 (registered medians reproduce within about 15% to 25% over one day; ratios of 5x to 8x for RGB are robust). Still to do: repeats on other days or busy periods, and repeat the key Profiler cases 2 or 3 times.
 
@@ -56,7 +57,7 @@ Sources for the quota text: [Earth Engine Noncommercial Tiers](https://developer
 ## Scope
 
 - **Phase 1 (this test build):** RGB, CHM and DEM (DSM, DTM, Derived Terrain) read from registered COG tiles.
-- **Phase 2 (not started):** hyperspectral (HSI) products. HSI and CNC are still read from the prod ingested collections.
+- **Phase 2 (tested on the REDB test set, runs 13 to 23; the viewer test build is unchanged):** hyperspectral (HSI) products. HSI and CNC are still read from the prod ingested collections in the viewer.
 
 ## Collections
 
@@ -609,6 +610,225 @@ Median wall-clock (s), fastest-slowest in the CSV; ratio to ING in brackets:
 - **No consistent winner between the layouts.** The expectation that pixel-interleaved wins for many bands or spectra and band-interleaved for few bands is **not supported** at these sizes: `bands3` is about equal (0.9 vs 0.9 s at 1 km; BAND 2.9 vs PIX 2.1 s at 3 km, but 0.4 vs 1.1 s at 3 km and 10 m), `bands50` is about equal, and `spec_point` is 1.5 (BAND) vs 1.1 s (PIX) with overlapping ranges.
 - **Outliers:** `bands50` 1 km at 1 m, repeat 3: PIX 68.8 s, BAND 35.3 s, ING 6.3 s (the other repeats were 4.5 to 10.5 s for all forms). Probably a transient backend slowdown, but it hit the two registered forms and not ING.
 - **Not covered here:** the heavy cases where BAND failed with "User memory limit exceeded" in run 13 (all 426 bands over 1 km at 1 m; 1000 random pixels over 3 km); see run 15. EECU not measured for reflectance yet.
+
+### Run 15 (2026-11-04): reflectance, heavy operations with `TILE_SCALE = 4`, `2026_REDB_6`, clean run
+
+- **Site-year and files:** `2026_REDB_6`. `ING` = `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6` (B001-B426 used); `BAND` = `projects/neon-nonprod-earthengine/assets/REFL/REG` and `PIX` = `projects/neon-nonprod-earthengine/assets/testREFL/PIX`, tiles selected with `AOP_ID = 2026_REDB_6` (50 tiles, mosaicked). Script `cog_refl_perf_test.js`, run id `qjuy`, label `REDB_REFL_heavy_run1`.
+- **Config:** matrix mode, Profiler off, one request at a time, 30 requests (`REPS = 2`); `bandsAll` (all 426 bands, mean) over 1 km at 1 m, 1 km at 10 m and 3 km at 10 m (3 km at 1 m skipped as too large, 3.8e9 values); `points` (1000 random pixels, all 426 bands) over 1 and 3 km; anchor [-111.780094, 40.800975]; **`TILE_SCALE = 4` for all forms**. Raw data: `results_2026-11-04_REFL_REDB_heavy_run1.csv` (30 rows, from the console text the user pasted; the summary block is not saved).
+- **Conditions:** one run id (`qjuy`) in all 30 progress lines, no errors, all 30 requests succeeded.
+
+Median wall-clock (s), 2 repeats (fastest-slowest in the CSV); ratio to ING in brackets:
+
+| Operation | ING | BAND | PIX |
+|---|---|---|---|
+| `bandsAll` 1 km, 1 m | 13.9 (13.0-14.7) | 10.0 (8.4-11.6) (0.72x) | 12.1 (11.5-12.6) (0.87x) |
+| `bandsAll` 1 km, 10 m | 1.5 (1.1-1.8) | 2.5 (2.4-2.7) (1.7x) | 2.2 (2.0-2.4) (1.5x) |
+| `bandsAll` 3 km, 10 m | 5.4 (2.9-7.9) | 8.3 (6.7-9.9) (1.5x) | 11.3 (8.6-14.0) (2.1x) |
+| `points` 1 km | 2.5 (1.9-3.1) | 4.6 (3.9-5.3) (1.9x) | 9.0 (7.4-10.7) (3.6x) |
+| `points` 3 km | 3.8 (3.5-4.0) | 18.7 (13.7-23.6) (4.9x) | 14.1 (7.8-20.3) (3.7x) |
+
+- **BAND no longer fails.** With `TILE_SCALE = 4` the band-interleaved form completed both cases that failed with "User memory limit exceeded" in run 13 (all 426 bands over 1 km at 1 m: 8.4 and 11.6 s; 1000 random pixels over 3 km: 13.7 and 23.6 s). **Caveat:** this run has no `TILE_SCALE = 1` control. Run 13 was an overlapping-runs run, so it is not proven that `tileScale` (rather than something else) removed the error; a clean `TILE_SCALE = 1` rerun of these two BAND cases would settle it (done in run 18: confirmed). The cases run 15 completed are also the ones the memory error hit, so as a practical rule, use `tileScale = 4` for all-band reductions and sampling on registered reflectance.
+- **Values agree.** At 1 m all three forms give the identical B001 mean (810.901 over 1 km); `points` returned 1000 in every case. At 10 m the registered forms are slightly below ingested (1 km: BAND 810.328, -0.031%; PIX 810.775, -0.024%, against ING 810.580; 3 km: BAND 813.583, -0.048%; PIX 813.939, -0.004%, against ING 813.975). BAND and PIX again differ from each other at 10 m although they hold the same pixels (overviews built differently), as in run 14.
+- **Where the time goes.** All-band means at 1 m take 10 to 14 s in every form (heavy work: 4.3e8 values); registered is not slower than ingested there (BAND 0.72x, PIX 0.87x, with only 2 repeats). At 10 m the registered forms are 1.5x to 2.1x ING (1 to 6 s of absolute difference). `points` is where ingested is clearly best: 2.5 and 3.8 s against 4.6 to 18.7 s (BAND) and 9.0 and 14.1 s (PIX).
+- **No consistent BAND vs PIX winner.** The hypothesis that pixel-interleaved wins for all-band operations and random sampling is **not supported**: PIX is slower than BAND for `points` 1 km (9.0 vs 4.6 s), faster for `points` 3 km (14.1 vs 18.7 s, but the ranges overlap), slower for `bandsAll` 3 km at 10 m (11.3 vs 8.3 s), about equal at 1 m. The repeat-to-repeat spread (up to 2.7x, for example PIX `points` 3 km 20.3 then 7.8 s; ING `bandsAll` 3 km 7.9 then 2.9 s) is as large as the differences between forms, so ratios under about 2x are not meaningful with 2 repeats.
+- **Run 13 timings were inflated by the overlap.** Run 13 measured PIX `points` at 40 to 140 s and BAND at 12 to 31 s; here the same cases took 7.4 to 20.3 s (PIX) and 3.9 to 23.6 s (BAND), so the overlapping runs, not the layout, explain most of that gap (`TILE_SCALE` also differs).
+- **Not measured:** EECU (measured in run 16, below); `bandsAll` over 3 km at 1 m; `points` at 10 m (the op always samples at 1 m); a `TILE_SCALE = 1` control at 1 m (run 16 shows BAND `bandsAll` 1 km at 10 m completes at `TILE_SCALE = 1`).
+
+### Run 16 (2026-11-04): reflectance EECU-seconds, `2026_REDB_6`, 1 km at 10 m, single runs (Profiler on)
+
+- **Site-year and files:** `2026_REDB_6`. `ING` = `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6`; `BAND` = `projects/neon-nonprod-earthengine/assets/REFL/REG`; `PIX` = `projects/neon-nonprod-earthengine/assets/testREFL/PIX` (both `AOP_ID = 2026_REDB_6`). Script `cog_refl_perf_test.js`, single mode, anchor [-111.780094, 40.800975] (the 1 km square sits on the corner where four tiles meet: `NEON_D15_REDB_DP3_433000_4516000`, `434000_4516000`, `433000_4517000`, `434000_4517000`), `TILE_SCALE = 1`, `sizeKm = 1`, `scale = 10`.
+- **Conditions:** six separate runs, one request each, tab reloaded and Profiler switched on before each; Profiler tables copied after they stopped changing; run ids `nfvi`, `tts0`, `bzvs`, `nlx9`, `hbki`, `jujk`. All completed without errors (so BAND `bandsAll` does complete at `TILE_SCALE = 1` at 10 m). EECU·s = sum of the rows by hand (the Profiler shows rows, not a total). **Single runs, no repeats**: the earlier RGB single runs repeated within about 5%, but the spread has not been measured for reflectance. The CSV label printed by the script was the stale `REDB_REFL_heavy_run1` in all six runs; no CSV was saved (the Profiler tables are the result). Wall-clock in these runs: see the last column.
+
+| Op | Form | EECU·s | vs ING | Wall-clock (s) | Value (B001 / B053 mean) |
+|---|---|---|---|---|---|
+| `bands3` | ING | 0.068 | 1x | 0.4 | 366.204 |
+| `bands3` | BAND | 0.116 | 1.7x | 0.6 | 365.992 |
+| `bands3` | PIX | 0.183 | 2.7x | 0.6 | 366.224 |
+| `bandsAll` (426 bands) | ING | 4.20 | 1x | 1.6 | 810.580 |
+| `bandsAll` (426 bands) | BAND | 5.14 | 1.22x | 1.5 | 810.328 |
+| `bandsAll` (426 bands) | PIX | 10.33 | 2.46x | 2.0 | 810.775 |
+
+Row-level breakdown (EECU·s, rounded):
+
+| Row | `bands3` ING | `bands3` BAND | `bands3` PIX | `bandsAll` ING | `bandsAll` BAND | `bandsAll` PIX |
+|---|---|---|---|---|---|---|
+| (plumbing) | 0.042 | 0.085 | 0.083 | 0.240 | 1.574 | 1.332 |
+| Asset loads (image or 4 tiles) | 0.015 | 0.004 | 0.039 | 2.306 | 0.520 | 4.706 |
+| `ImageCollection.mosaic` | n/a | 0.020 | 0.053 | n/a | 2.313 | 3.623 |
+| `Image.reduceRegion` | 0.010 | 0.005 | 0.005 | 1.611 | 0.534 | 0.528 |
+| Other (reprojecting, `select`, `setDefaultProjection`, ...) | 0.001 | 0.002 | 0.003 | 0.044 | 0.195 | 0.143 |
+
+- **Cost grows with the number of bands, less than in proportion:** ING 62x for 142x as many bands; BAND 44x; PIX 56x.
+- **BAND is close to ING for all bands** (1.22x, about 0.9 EECU·s more) and 1.7x for 3 bands (about 0.05 more). The mosaic is the main registered-only cost (2.3 EECU·s, 45% of the total for 426 bands).
+- **PIX costs about twice BAND** (2.0x for `bandsAll`, 1.6x for `bands3`). Nearly all of the extra comes from two rows: the tile asset loads (0.039 vs 0.004 for 3 bands; 4.71 vs 0.52 for all bands, about 9x to 10x per load, with the same number of loads, 1,279 per tile for `bandsAll`) and the mosaic (1.6x to 2.6x BAND). Plumbing and the reduction itself are the same in both. This is the same pattern as the `901` collection (asset loads far more expensive than in `900`) and is probably a property of the tile metadata or layout, not of the data volume; not verified (question for the data owner). The per-tile load cost also varies between the four tiles (0.86 to 1.50 EECU·s for `bandsAll`), so single runs are only indicative.
+- **Wall-clock hides the difference.** All six runs took 0.4 to 2.0 s, and the three `bandsAll` runs took 1.6, 1.5 and 2.0 s while costing 4.2, 5.1 and 10.3 EECU·s, because the work runs in parallel. For quota the EECU figure matters, not the elapsed time.
+- **Values:** same ordering as runs 14 and 15 (BAND below ING at 10 m, PIX within 0.03%; B053 over 1 km: ING 366.204, BAND 365.992 (-0.058%), PIX 366.224 (+0.005%)).
+- **Scale reference:** 4.2 to 10.3 EECU·s for one all-band mean over 1 km. The Community tier is 540,000 EECU·s per month, so on the order of 50,000 to 130,000 such requests; a single all-band 1 km request is not a quota concern, large all-band regions or repeated per-tile exports could be.
+- **Not measured:** `spec_point`, `spec_poly`, `points`, `ndvi`, larger regions, 1 m scale, repeats for spread, a `TILE_SCALE = 4` profile.
+
+### Run 17 (2026-11-05): wall-clock of the new `REG_TILES`, RGB `stats`, 5 km at 10 m, `2026_REDB_6` (optional run 1b of the finishing plan)
+
+- **Site-year and files:** `2026_REDB_6`. `ING` = `projects/neon-prod-earthengine/assets/RGB/001/2026_REDB_6`; `REG` and `REG_TILES` = `projects/neon-nonprod-earthengine/assets/RGB/REG` (`YEAR_SITE_VISIT = 2026_REDB_6`, 35 tiles touched; the semi-final RGB build). Script `cog_vs_ingested_perf_test.js` with `TILES_CLIENT_COMBINE = true` (one `reduceRegion` per tile, combined in the browser), label `REDB_RGB_REG_tiles_v2`. Raw data: `results_2026-11-05_RGB_REDB_REG_tiles_v2.csv` (9 rows, saved from the console text the user pasted).
+- **Config:** matrix mode, `STAGING = false`, `REG_VERSIONS = ['REG']`, forms ING / REG / REG_TILES, `EXTENT_OVERRIDE` {lon -111.780094, lat 40.800975, shortSideM 7000}, 5 km square, 10 m, `REPS = 3`, Profiler off. This harness prints no run id, so overlap of two runs cannot be excluded from the output; the console showed one set of 9 cases ("Done: 9 cases") and no errors.
+
+| Form | Median wall-clock (s) | Fastest-slowest | vs ING |
+|---|---|---|---|
+| ING | 0.8 | 0.7-0.9 | 1x |
+| REG (mosaic of 35 tiles) | 0.9 | 0.9-1.6 | 1.2x |
+| REG_TILES (new, no mosaic) | 0.3 | 0.2-0.3 | 0.3x |
+
+- **The new `REG_TILES` is the fastest form** in wall-clock: 0.3 s against 0.8 s for ING and 0.9 s for the mosaic (about 3x faster than REG). Together with its compute (about 1.6 EECU·s against about 5.0 for REG and 0.46 for ING, single runs, "Profiler runs, REDB") it is cheaper than REG on both measures; the ING EECU is still lower. Replaces the old `REG_TILES` figure of 0.8 s from run 12.
+- **Comparison with run 12 (same site, size and scale):** ING 0.8 s here against 0.4 s, REG 0.9 s against 1.9 s. The ING and REG medians moved in opposite directions, so there is large run-to-run variability (backend load, time of day); compare forms within a run, not across runs. The ordering REG_TILES < ING ~ REG is the same size as the variability for ING against REG and should not be over-read; REG_TILES being much faster than REG is clear (0.2 to 0.3 s against 0.9 to 1.6 s in every repeat).
+- **Result agrees with the earlier check:** REG_TILES G mean 85.41157 and SD 19.22572 (the same numbers as in the re-profile). REG mosaic: mean 85.40512, SD 19.22247, so REG_TILES and REG differ by +0.008% (mean) and +0.017% (SD); min and max are identical (14, 207). Both registered forms are -0.3% (mean), -3.3% (SD) and +13% (max 207 against 183) relative to ING at 10 m, the known overview and resampling effect (see run 12); the max difference at 10 m is consistent with the unexplained 5 km maximum anomaly (213 against 160 at 32 m in run 12), which is still not located.
+- **Not measured:** other sizes and scales for the new `REG_TILES`, CHM, and the new version's wall-clock at 20 km (JERC).
+
+### Run 18 (2026-11-05): reflectance heavy operations at the default `TILE_SCALE = 1` (control for run 15), `2026_REDB_6`, clean run
+
+- **Site-year and files:** same as run 15: `2026_REDB_6`; `ING` = `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6`; `BAND` = `projects/neon-nonprod-earthengine/assets/REFL/REG`; `PIX` = `projects/neon-nonprod-earthengine/assets/testREFL/PIX` (both `AOP_ID = 2026_REDB_6`). Script `cog_refl_perf_test.js`, run id `2ukp`, label `REDB_REFL_heavy_ts1`. Raw data: `results_2026-11-05_REFL_REDB_heavy_ts1.csv` (18 rows).
+- **Config:** identical to run 15 except **`TILE_SCALE = 1`** and `SCALES = [1]` (so `bandsAll` 1 km at 10 m and 3 km at 10 m were not repeated): `bandsAll` over 1 km at 1 m, `points` (1000 random pixels, all 426 bands) over 1 and 3 km; 18 requests, `REPS = 2`, matrix mode, Profiler off, anchor [-111.780094, 40.800975]. One run id in all 18 progress lines.
+
+Median wall-clock (s), fastest-slowest; run 15 (`TILE_SCALE = 4`) in the last column for comparison:
+
+| Operation | Form | `TILE_SCALE = 1` (run 18) | `TILE_SCALE = 4` (run 15) |
+|---|---|---|---|
+| `bandsAll` 1 km, 1 m | ING | 70.6 (39.8-101.4) | 13.9 (13.0-14.7) |
+| | BAND | **FAILED 2 of 2: "User memory limit exceeded."** (after 17 and 18 s) | 10.0 (8.4-11.6) |
+| | PIX | 139.5 (55.6-223.4) | 12.1 (11.5-12.6) |
+| `points` 1 km | ING | 1.8 (1.7-1.9) | 2.5 (1.9-3.1) |
+| | BAND | 20.6 (15.3-25.9) | 4.6 (3.9-5.3) |
+| | PIX | 18.6 (11.7-25.4) | 9.0 (7.4-10.7) |
+| `points` 3 km | ING | 17.0 (16.8-17.2) | 3.8 (3.5-4.0) |
+| | BAND | **FAILED 2 of 2: "User memory limit exceeded."** (after 26 and 22 s) | 18.7 (13.7-23.6) |
+| | PIX | 124.3 (49.1-199.6) | 14.1 (7.8-20.3) |
+
+- **Confirmed: with the default `TILE_SCALE = 1` the band-interleaved form fails** for all 426 bands over 1 km at 1 m and for 1000 random pixels over 3 km (both repeats of both cases), the same two cases that failed in run 13, with the same error; these are the cases that completed at `TILE_SCALE = 4` in run 15. `points` over 1 km completed for BAND at the default (15 to 26 s). ING and PIX completed every case. Values agree where cases completed (B001 mean 810.901; `points` 1000).
+- **`TILE_SCALE = 4` also made everything faster, not only BAND completable.** Across forms the default setting was 3x to 10x slower in this comparison: ING `bandsAll` 70.6 vs 13.9 s, PIX `bandsAll` 139.5 vs 12.1 s, PIX `points` 3 km 124.3 vs 14.1 s, ING `points` 3 km 17.0 vs 3.8 s (only ING `points` 1 km was unchanged, 1.8 vs 2.5 s). The two runs were made on different occasions and the repeat-to-repeat spread is large (PIX `bandsAll` 55.6 and 223.4 s; PIX `points` 3 km 49.1 and 199.6 s), so the size of the ratios is indicative; the direction is the same in 7 of 8 comparable cases. Practical rule: for all-band or sampling operations at 1 m use `tileScale = 4` (or more) with every form, ingested too; the viewer's stats tool already uses 4.
+- **Implication for the layouts at `tileScale = 1`:** band-interleaved is the one that fails (memory), and pixel-interleaved is slowest (all `bandsAll` and `points` 3 km cases), so neither layout is preferable without a raised `tileScale`; ingested is the most robust.
+- **Not measured:** `tileScale` 2, 8 or 16; `TILE_SCALE = 1` at 10 m for the wall-clock matrix (EECU at `TILE_SCALE = 1`, 10 m, completed for all forms in run 16).
+
+### Run 19 (2026-11-05): random forest classification, REDB reflectance + CHM, `compare` mode, 1 m and 4 m, `TILE_SCALE = 16`
+
+- **Site-year and files:** `2026_REDB_6`. `ING` = `projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6`; `BAND` = `projects/neon-nonprod-earthengine/assets/REFL/REG`; `PIX` = `projects/neon-nonprod-earthengine/assets/testREFL/PIX` (both `AOP_ID = 2026_REDB_6`, mosaicked); the CHM predictor is the registered `projects/neon-nonprod-earthengine/assets/CHM/REG` (`YEAR_SITE_VISIT = 2026_REDB_6`) in all three forms (the ingested CHM ends at 2023). Script `cog_refl_classification_test.js`, run id `rcg6`, mode `compare`. Raw data: `results_2026-11-05_RF_REDB_compare_run1.csv` (6 rows); labels: `redb_class_labels.geojson`.
+- **Method (modelled on the user's CLBJ script):** 381 reflectance bands (B001-B426 minus 195-205, 287-310 and 416-425) plus the CHM = 382 predictors; 90 hand-placed points in 5 made-up classes (EN 20, DB 20, MX 15, SH 20, DV 15; class codes 0-4; REDB has no in situ vegetation data); per-class 80/20 split done in the browser (seed 1; 72 train, 18 test before dropping points with no data); `sampleRegions` at the stated scale with `tileScale = 16`; 100-tree `smileRandomForest` (seed 1); points sorted by id so every form trains on the same row order. Accuracy is not the goal.
+- **Conditions:** one run id in all six progress lines, no errors, Profiler off, one run each (no repeats). An earlier attempt (run id `60if`) failed on every request with "Request had invalid authentication credentials" (expired Code Editor login) and is not a result.
+
+| Scale | Form | Points sampled (train/test) | Sampling step (s) | Whole pipeline (s) | Test accuracy | Kappa |
+|---|---|---|---|---|---|---|
+| 1 m | ING | 85 (68/17) | 2.2 | 0.5 | 0.412 | 0.261 |
+| 1 m | BAND | 85 (68/17) | 5.0 | 1.2 | 0.412 | 0.261 |
+| 1 m | PIX | 85 (68/17) | 5.1 | 4.3 | 0.412 | 0.261 |
+| 4 m | ING | 85 (68/17) | 3.8 | 2.5 | 0.235 | 0.035 |
+| 4 m | BAND | **87 (70/17)** | 6.1 | 3.0 | 0.235 | 0.035 |
+| 4 m | PIX | **87 (70/17)** | 8.8 | 4.0 | 0.235 | 0.035 |
+
+- **At 1 m the three forms are identical** (the control): same 85 sampled points, identical confusion matrices, same accuracy and kappa, and 85/85 identical predictions for every pair. The pipeline (382 bands, `tileScale = 16`) ran on all three forms with no memory error.
+- **At 4 m BAND and PIX are identical to each other** (87/87 identical predictions, identical confusion matrices), **but differ from ING**: 80 of the 85 common points get the same prediction (94.1%; 14 of 17 test points). The five differing points (pid:reference, BAND/PIX prediction vs ING prediction): 14 EN (EN/MX), 26 DB (MX/SH), 52 MX (SH/MX), 59 SH (SH/EN), 83 DV (SH/DV). The overall test accuracy and kappa are the same (0.235, 0.035) only by coincidence; the confusion matrices differ (BAND/PIX diagonal 2, 0, 0, 1, 1; ING 1, 0, 0, 1, 2).
+- **The registered forms keep two more points at 4 m than ING** (87 against 85) and more than at 1 m (85 for all three). So two points that have no data at 1 m get valid values at 4 m in the registered overviews, while ING at 4 m stays at 85. Hypothesis, not verified: overview cells built from partly masked 1 m pixels are valid in the registered tiles and masked in ingested. Which points, and whether their values are sound, was not recorded (the script was extended afterwards to print the dropped points and the points present in only one form; rerun to see them).
+- **Timings** (single runs, one request each, form order rotated between scales): the sampling step took 2.2 to 3.8 s for ING and 5.0 to 8.8 s for BAND and PIX (registered about 1.6x to 2.3x ING, as in runs 14 and 15). The "whole pipeline" step is quicker than the sampling step for ING and BAND because it re-uses data the sampling step already read, so only the sampling column is a cold-read comparison. All cases are seconds.
+- **Caveats:** test sets are tiny (17 points; each point is 6 percentage points of accuracy), so the low accuracies (0.41 at 1 m, 0.24 at 4 m) say nothing about the forms; the classes (EN, DB, MX, SH, DV) are made up and hard to separate. The accuracy at 4 m is lower than at 1 m partly because the points were placed on 1 m ground.
+- **Not run yet (as of run 19):** the default `TILE_SCALE = 1` (done in run 20), EECU (`profile`), whole-site classification (`site`), map rendering (`render`) and export.
+
+### Run 20 (2026-11-05): the same classification `compare` at the default `TILE_SCALE = 1` (control for run 19)
+
+- **Site-year and files, method:** identical to run 19 (`2026_REDB_6`; `HSI_REFL/002/2026_REDB_6`, `REFL/REG`, `testREFL/PIX` with `AOP_ID`, registered `CHM/REG` as predictor; 382 inputs; 90 points; same seeded split) except **`TILE_SCALE = 1`** (the setting a user gets without the `tileScale: 16` of the CLBJ script). Script `cog_refl_classification_test.js`, run id `2njc`, mode `compare`. Raw data: `results_2026-11-05_RF_REDB_compare_ts1.csv` (6 rows). One run id, no errors, Profiler off, one run each. The console output lacks the "dropped for no data" lists, so the Code Editor held the earlier paste of the script, not the extended one; this does not change the results.
+
+Sampling step (s) at `TILE_SCALE = 1`, with `TILE_SCALE = 16` (run 19) in brackets, and the ratio to ING in the same setting:
+
+| Scale | ING | BAND | PIX |
+|---|---|---|---|
+| 1 m | 3.3 (2.2) | 18.1 (5.0), 5.5x (2.3x) | 21.0 (5.1), 6.4x (2.3x) |
+| 4 m | 2.8 (3.8) | 43.7 (6.1), 15.6x (1.6x) | 58.8 (8.8), 21x (2.3x) |
+
+- **Nothing failed at the default.** BAND and PIX sampled 382 bands at 90 points spread over the whole site and trained and predicted without a memory error (compare run 18, where 1000 random points with 426 bands over 3 km failed for BAND at the default). The failure limit depends on points x bands x area, so a modest labelled sample is below it.
+- **The results are unchanged by `tileScale`**: identical accuracy (0.412 at 1 m, 0.235 at 4 m), kappa, confusion matrices and predictions as run 19, including the 4 m differences between ING and the registered forms (80 of 85 common points agree, BAND = PIX, 87 against 85 points sampled).
+- **But the registered forms are much slower at the default**: the sampling step took 18 to 59 s for BAND and PIX against 5 to 9 s at `tileScale` 16, and was 5x to 21x the ingested time (ING 2.8 to 3.3 s in both settings; `tileScale` hardly matters for the single ingested image). So the user's `tileScale: 16` is worth a factor of about 3x to 9x for registered tiles in this analysis, and the ratio to ingested falls from 5x to 21x to 1.6x to 2.3x. Possible reason (not tested): with 90 points over about 50 tiles, more tiles per computation raise the overhead and memory; larger `tileScale` splits the work. Single runs, and wall-clock varies (the 44 to 59 s cases at 4 m may include backend variability), so treat the factors as indicative.
+- **The "whole pipeline" column is not a clean timing.** It re-uses data the sampling step already read (PIX at 4 m: 0.6 s after a 58.8 s sampling step), so only the sampling column is a cold-read comparison.
+- **Practical rule (consistent with run 18):** for sampling or reducing many bands from registered tiles use a large `tileScale` (4 to 16) even when nothing fails; the default is slow and fails for larger samples. State it in the user guidance.
+
+### Run 21 (2026-11-05): random forest classification, EECU-seconds (Profiler), REDB reflectance + CHM, 1 m, `TILE_SCALE = 16`
+
+- **Site-year and files, method:** as run 19 (`2026_REDB_6`; `HSI_REFL/002/2026_REDB_6`, `REFL/REG`, `testREFL/PIX` with `AOP_ID`, registered `CHM/REG`; 382 inputs; 90 points, 85 with data; seeded split). Script `cog_refl_classification_test.js`, mode `profile`, `SINGLE = {form, scale: 1}`, `TILE_SCALE = 16`. One run per form, Profiler switched on before Run, tab reloaded, table copied after it settled; run ids `ybe6` (ING), `p0oi` (BAND), `kngw` (PIX), all single requests. Each printed result matched the earlier runs (accuracy 0.4118, kappa 0.2609, 85 points sampled, 68 train, 17 test, 382 inputs). EECU = sum of the Profiler rows, added by hand. No CSV (the Profiler tables are the result).
+- **What one request does:** sample the 90 points from the 382-band composite, train a 100-tree random forest, predict all points, build the confusion matrix on the test points (the `pipeline()` function).
+
+| Form | EECU·s | vs ING | Main rows (EECU·s) | Pipelines per 150 EECU-hours (540,000 EECU·s) |
+|---|---|---|---|---|
+| ING | about 154.6 | 1x | asset loading 127.4 (201,377 loads, 0.63 ms each), plumbing 25.3 | about 3,500 |
+| BAND | about 124.3 | 0.80x | plumbing 69.4 (1.2M operations), asset loading 39.5 (207,582 loads, 0.19 ms each), mosaic 5.9, reprojecting 5.9, `setDefaultProjection` pixels 2.3 | about 4,300 |
+| PIX | about 180.8 | 1.17x (1.45x BAND) | asset loading 98.0 (207,404 loads, 0.47 ms each), plumbing 66.4, mosaic 6.2, reprojecting 5.9, `setDefaultProjection` pixels 2.7 | about 3,000 |
+
+- **All three forms cost about the same order, 125 to 181 EECU·s**, and the ingested image is not the cheapest here (BAND is 20% cheaper; PIX 17% dearer). This differs from the region statistics (RGB `stats`: ING 11x cheaper; reflectance `bandsAll` 1 km at 10 m in run 16: ING 4.2, BAND 5.1, PIX 10.3). The reason is the workload: `sampleRegions` evaluates each point and each band separately (about 200,000 asset loads, about 6 per band per point, in every form), so the per-load cost matters most. Asset loading costs the single ingested image 0.63 ms per load against 0.19 ms for the BAND tiles and 0.47 ms for PIX; BAND and PIX pay extra for plumbing, mosaic and reprojection instead. Why an ingested load costs more is not known (possibly the 442-band asset record).
+- **PIX against BAND:** the whole difference (about 56 EECU·s) is the tile asset loads (98.0 against 39.5); plumbing, mosaic and reprojection are the same. Same pattern as run 16, where PIX tile loads were about 9x to 10x BAND at 10 m (here about 2.5x).
+- **The random forest training is negligible** (0.1 to 0.3 EECU·s). The cost scales with points x bands, so a larger labelled sample costs proportionally more (not measured).
+- **Wall-clock hides it:** these requests took 0.5 to 4 s in `compare` (run 19) while costing 125 to 181 EECU·s.
+- **Repeat (2026-11-05 23:39 to 23:41 UTC, same script, settings and window, order reversed: BAND, PIX, ING; run ids `xk8h`, `4xgn`, `b3hb`; each printed result matched: accuracy 0.4118, kappa 0.2609, 85 points):**
+
+| Form | First run | Repeat | Mean | Difference between the two runs |
+|---|---|---|---|---|
+| ING | about 154.6 | about 149.1 (asset loading 124.2, plumbing 23.2) | about 152 | 3.6% |
+| BAND | about 124.3 | about 109.3 (plumbing 59.1, asset loading 37.1, mosaic 5.2, reprojecting 4.6) | about 117 | 12% |
+| PIX | about 180.8 | about 171.3 (asset loading 97.6, plumbing 60.3, mosaic 5.4, reprojecting 4.7) | about 176 | 5.3% |
+
+  The operation counts of each form match almost exactly between its two runs (BAND 207,514 against 207,582 asset loads; PIX 207,544 against 207,404; ING 201,379 against 201,377), so the same work cost 4% to 12% different EECU·s. The asset-loading rows are the most stable (PIX 97.6 against 98.0, ING 124.2 against 127.4, BAND 37.1 against 39.5); most of the movement is in the plumbing row (BAND 59.1 against 69.4). **The ranking holds: the two BAND runs (109 to 124) are all below the two ING runs (149 to 155), which are below the two PIX runs (171 to 181)**, so by the means BAND is about 0.77x ING and PIX about 1.16x ING (PIX about 1.5x BAND); the run-to-run spread (up to 12%) means differences between forms under about 15% would not be meaningful. Pipelines per 150 EECU-hours (540,000 EECU·s), by the means: ING about 3,550, BAND about 4,600, PIX about 3,100. Two runs per form only.
+- **Caveats:** two runs per form (see the repeat above; earlier RGB repeats were within about 5%). The Profiler shows 3 `sampleRegions` and 180 `reduceRegions` calls for 90 points, which suggests the one-request pipeline evaluates the sampling more than once (it uses the sampled set for counts, training and prediction); a plain "sample once" workflow may cost less, in all forms, so compare the forms with each other and not with a user's own script. Profiled only at `TILE_SCALE = 16`; the wall-clock results at `TILE_SCALE = 1` (run 20) suggest the registered forms would cost more at the default.
+- **Not measured:** a sampling-only profile (to remove the repeated evaluation), `TILE_SCALE = 1`, 4 m, larger point sets, and the whole-site classification, rendering and export.
+
+### Run 22 (2026-11-05): whole-site random forest classification, REDB reflectance + CHM, 10 m and 4 m, `TILE_SCALE = 16`
+
+- **Site-year and files, method:** as run 19 (`2026_REDB_6`; `HSI_REFL/002/2026_REDB_6`, `REFL/REG`, `testREFL/PIX` with `AOP_ID`, registered `CHM/REG`; 382 predictors; 90 labelled points). Script `cog_refl_classification_test.js`, mode `site`, run id `jjfn`, `SITE_SCALES = [10, 4]`, `TILE_SCALE = 16`, classifier trained at 1 m inside every request (sample, train, then classify the composite and `reduceRegion` a `frequencyHistogram` of the classes over the site's tile bounding box, 7 x 8 km, UTM 12N E 431000-438000, N 4513000-4521000). Raw data: `results_2026-11-05_RF_REDB_site_run1.csv` (6 rows). One run id, six requests one at a time, no errors, Profiler off, one request per case (no repeats).
+
+| Scale | Form | Seconds | Pixels classified | EN | DB | MX | SH | DV (% of pixels) |
+|---|---|---|---|---|---|---|---|---|
+| 10 m | ING | 14.0 | 305,148 (fractional counts) | 14.4 | 38.4 | 22.2 | 24.1 | 0.8 |
+| 10 m | BAND | 16.5 | 307,800 | 14.1 | 39.6 | 21.7 | 23.8 | 0.8 |
+| 10 m | PIX | 20.9 | 306,468 | 15.3 | 37.5 | 22.3 | 23.7 | 1.2 |
+| 4 m | ING | 13.1 | 1,906,645 (fractional counts) | 15.7 | 36.8 | 22.6 | 23.7 | 1.2 |
+| 4 m | BAND | 38.2 | 1,914,985 | 15.3 | 37.6 | 22.3 | 23.6 | 1.2 |
+| 4 m | PIX | 31.3 | 1,914,985 | 15.3 | 37.6 | 22.3 | 23.6 | 1.2 |
+
+- **The whole site classifies interactively in all three forms, with no memory error or timeout**, in 13 to 38 s per request at `tileScale` 16 (including training the classifier at 1 m). 1 m over the whole site was not attempted interactively (it is the export case).
+- **The classified area is about 30.6 km2, not 46 km2** (3.05e5 pixels at 10 m, 1.91e6 at 4 m): the composite is masked wherever any of the 382 bands or the registered CHM has no data (the CHM covers 43 of the 50 reflectance tiles; the rest of the shortfall is not explained). The script header said "about 46 km2 of data"; corrected.
+- **Timing:** registered 1.2x to 1.5x ING at 10 m (16.5 and 20.9 s against 14.0 s) and about 2.4x to 2.9x at 4 m (31.3 and 38.2 s against 13.1 s). Single requests, so differences under about 25% are noise; ING takes about the same at both scales, so most of its time is the training step.
+- **Class maps agree closely but not exactly.** At 4 m BAND and PIX give identical pixel counts and class shares (as in run 19, they are identical to each other); ING differs by up to 0.8 percentage points (DB 36.8% against 37.6%, EN 15.7% against 15.3%) and its pixel count is 0.44% lower. At 10 m the three forms differ by up to 2.1 points (DB: ING 38.4, BAND 39.6, PIX 37.5; DV: 0.8, 0.8, 1.2), and BAND differs from PIX, as in the other 10 m results (their overviews were built differently). Each form's 10 m shares also differ from its own 4 m shares by up to 2 points (BAND DB 39.6 against 37.6), so the choice of reduction scale matters as much as the choice of form. At these scales the composite is aggregated before it is classified (the classifier sees resampled bands, not the 1 m spectra).
+- **Pixel counts in ING are fractional** (305,147.69 at 10 m), the registered forms are whole numbers: the ingested image's coarse-scale mask carries partial pixel weights (edge pixels counted as fractions), the registered mask does not. Not investigated further.
+- **Not measured:** 1 m over the whole site (export), map rendering (Profiler), EECU of the whole-site run, repeats, `TILE_SCALE = 1`.
+
+### Run 23 (2026-11-05): map rendering of the classified image, ingested only so far (PROVISIONAL), `render` mode
+
+- **Site-year and files, method:** as run 19 (`2026_REDB_6`; ingested `HSI_REFL/002/2026_REDB_6` + registered `CHM/REG`; 382 predictors; 90 labelled points). Script `cog_refl_classification_test.js`, mode `render`, form `ING`, run id `21yw`, zoom 14 at the anchor [-111.780094, 40.800975], `TILE_SCALE = 16`, classifier trained at 1 m inside the layer expression (`TRAIN_SCALE = 1`), Profiler on, one run, no panning or zooming. The Profiler table was copied when the image had filled the map; it was not verified that the table had stopped changing (the earlier render profiles kept accumulating), so the total is a lower bound. 36 map tiles ("Encoding pixels to image" 36).
+- **ING total about 5,895 EECU·s** (sum of the rows by hand): loading assets 4,834 (7.5M loads), plumbing 908 (14.3M operations), `Image.classify` pixels 85, other rows about 68 (`select`, `addBands`, `reduceRegions`, training 6.0, mosaic 4.3 and others).
+- **The classifier is retrained for every map tile.** `Classifier.train` ran 74 times and `Image.reduceRegions` 6,660 times (= 74 x 90 points), about 2 trainings per map tile, so the sampling and training cost (about 80 EECU·s per training here) is paid again for each tile. Drawing one view therefore costs about 38 times the one-off pipeline of run 21 (155 EECU·s), about 92 views per 150 EECU-hours (540,000 EECU·s). The user's CLBJ script has the same structure (train, then classify the image for display), so every pan and zoom costs this. Recommendation (not tested): train once and save the classifier (`Export.classifier.toAsset`) or export the classified image, and display that.
+- **Second ING reading (2026-11-05 23:24 UTC, run id `ihax`, same script and settings):** the Profiler reported "28 profiles, 1 from API calls and 27 from map tiles", "Encoding pixels to image" 27 (a smaller window or a table that had not finished loading); total about 4,357 EECU·s (loading assets 3,607, plumbing 680, `Image.classify` pixels 21, other about 49); `Classifier.train` 56 calls (about 2.07 per map tile), `Image.reduceRegions` 5,040 (= 56 x 90). **Cost per map tile: about 161 EECU·s here and about 164 in run `21yw` (5,895 / 36), within 2%**, so the cost is proportional to the number of map tiles and the first reading was probably complete for its tiles. Compare forms per map tile (EECU·s divided by the "Encoding pixels to image" count), not by the total.
+- **BAND reading (2026-11-05 23:28 UTC, run id `zsok`, same script and settings, form `BAND` = `REFL/REG` mosaic + `CHM/REG`):** "28 profiles, 1 from API calls and 27 from map tiles", "Encoding pixels to image" 27, `Classifier.train` 56, same window and tile count as the second ING reading; total about 3,567 EECU·s = **about 132 per map tile, 0.82x ING `ihax` (4,357; 161 per tile)**. Rows: plumbing 1,714 (33.6M operations), loading assets 1,080 (5.9M loads), `ImageCollection.mosaic` 506, reprojecting 147, `setDefaultProjection` pixels 64, `Image.classify` pixels 26, other about 31. BAND is cheaper than ingested (as in the run 21 pipeline, 0.80x): the registered form pays for plumbing, mosaic and reprojection but its tile loads cost far less than the ingested image's loads (1,080 against 3,607).
+- **PIX reading (2026-11-05 23:32 UTC, run id `9lbf`, same script and settings, form `PIX` = `testREFL/PIX` mosaic + `CHM/REG`):** "28 profiles, 1 from API calls and 27 from map tiles", "Encoding pixels to image" 27, `Classifier.train` 56, same window as the ING and BAND readings; total about 5,230 EECU·s = **about 194 per map tile, 1.20x ING and 1.47x BAND**. Rows: loading assets 2,774 (5.9M loads, 0.47 ms each against 0.18 ms for BAND), plumbing 1,675, `ImageCollection.mosaic` 516, reprojecting 145, `setDefaultProjection` pixels 62, `Image.classify` pixels 26, other about 31. The whole gap to BAND (about 1,660 EECU·s) is the tile asset loads (2,774 against 1,080); plumbing, mosaic and reprojection are the same, as in run 21 and run 16.
+
+Classified map layer, EECU for 27 map tiles at zoom 14 (same window, `TILE_SCALE = 16`, classifier trained inside the layer expression, single runs):
+
+| Form | EECU·s | Per map tile | vs ING | Views of 27 tiles per 150 EECU-hours (540,000 EECU·s) |
+|---|---|---|---|---|
+| ING (`ihax`) | about 4,357 | about 161 | 1x | about 124 |
+| BAND (`zsok`) | about 3,567 | about 132 | 0.82x | about 151 |
+| PIX (`9lbf`) | about 5,230 | about 194 | 1.20x | about 103 |
+
+- **The ordering is the same as for the one-off pipeline (run 21: BAND 0.80x, PIX 1.17x of ING):** BAND is the cheapest to draw, PIX the dearest, ING in between, and the forms are within about 1.5x of each other. The first ING reading (`21yw`, 36 tiles, 164 per tile) agrees with `ihax` (161 per tile) within 2%.
+- **For all forms the dominant cost is the repeated training, not the form:** about 2 trainings per map tile, each re-sampling the 90 points, so a layer costs 130 to 190 EECU·s per map tile whatever the storage form; one view of 27 tiles uses about 1/100 to 1/150 of the monthly Community allowance. Training once and saving the classifier or the classified image would remove most of it (not tested).
+- **History:** the first BAND and PIX render attempts failed when the Profiler returned "Profile.getProfiles: Profile not found" before the table completed; they were repeated successfully (readings above). The whole-site export is run 24.
+
+### Run 24 (2026-11-05): whole-site classified-image export at 4 m (batch EECU-seconds from the Tasks tab)
+
+- **Site-year and files, method:** as run 19 (`2026_REDB_6`; `HSI_REFL/002/2026_REDB_6`, `REFL/REG`, `testREFL/PIX` with `AOP_ID`, registered `CHM/REG`; 382 predictors; 90 labelled points; seeded split). Script `cog_refl_classification_test.js`, mode `export`, `EXPORT = {scale: 4}`, `TILE_SCALE = 16`, `TRAIN_SCALE = 1` (the classifier is trained at 1 m inside the export), region = the site's tile bounding box (7 x 8 km, UTM 12N), `crs = EPSG:32612`, byte GeoTIFF to Google Drive (`Export.image.toDrive`). One task per form, started from the Tasks tab one after the other (each finished before the next started). The exported rasters were not opened or checked.
+
+| Form | Task id | Started (-0700) | Runtime | Batch compute (EECU·s) | vs ING |
+|---|---|---|---|---|---|
+| ING | `HZBSGABKKNA56NUSXQXP6HWV` | 2026-11-05 16:44:52 | 7 min | 281.86 | 1x |
+| BAND | `ART4M3UCXVPCRUOFFVHI7QVT` | 16:55:37 | 4 min | 667.69 | 2.37x |
+| PIX | `V5IEXEB55I3NMVHJNPIZ7BVG` | 17:01:17 | 4 min | 642.85 | 2.28x |
+
+All three: phase Completed, attempt 1, priority 100. Whole-site 4 m classification is about 1.9 million pixels (30.6 km2, run 22).
+
+- **A whole-site classified image at 4 m costs 282 to 668 EECU·s as a batch export**, about 1/800 to 1/1,900 of a Community month, and completes in minutes. Pre-run extrapolation from the render profile was 8,000 to 9,000 EECU·s per form (the render retrains the classifier for every map tile); the batch export does not do that. **The export is about 15x (ING), 5x (BAND) and 8x (PIX) cheaper than drawing one 27-tile view of the live classifier layer** (4,357, 3,567 and 5,230 EECU·s, run 23), so exporting the classified image once and displaying that is the cheaper pattern (the export, not the display of the exported image, was measured).
+- **The form ranking reverses in the export:** ingested is the cheapest (282), registered `BAND` and `PIX` cost about 2.3x to 2.4x (668 and 643, within 4% of each other, no meaningful difference). In the point-sampling pipeline (run 21) and the map render (run 23) `BAND` was the cheapest and `PIX` the dearest. Likely reason (not verified): classifying about 1.9 million pixels from 382 bands reads and mosaics all the registered tiles, so the mosaic and reprojection cost scales with pixels, whereas the 90-point sampling of runs 21 and 23 touches few tiles. Consistent with the region results (all-band mean over 1 km: ingested 4.2, `BAND` 5.1, `PIX` 10.3 EECU·s).
+- **The runtime is not the compute:** ING took 7 min and used the least EECU, `BAND` and `PIX` took 4 min each; queue and wait time make batch runtime unreliable.
+- **Not measured:** a 1 m export (about 16x as many pixels; not run, the cost could be on the order of 5,000 to 11,000 EECU·s per registered form if it scales with pixels, about 1% to 2% of a Community month), repeats (single task per form), the exported rasters' agreement with the `site` histogram, `TILE_SCALE = 1`.
 
 ### Profiler runs (2026-11-03): EECU-seconds, RGB `stats`, 9 km, 10 m, anchor [-84.469531, 31.240337]
 

@@ -1,0 +1,7 @@
+run,form,scale_m,tile_scale,status,n_inputs,n_sampled,n_train,n_test,sample_s,pipeline_s,accuracy,kappa,error,site_year,source
+2026-11-05 20:57 UTC #rcg6,ING,1,16,ok,382,85,68,17,2.2,0.5,0.4118,0.2609,,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6 + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)
+2026-11-05 20:57 UTC #rcg6,BAND,1,16,ok,382,85,68,17,5.0,1.2,0.4118,0.2609,,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6) + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)
+2026-11-05 20:57 UTC #rcg6,PIX,1,16,ok,382,85,68,17,5.1,4.3,0.4118,0.2609,,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6) + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)
+2026-11-05 20:57 UTC #rcg6,BAND,4,16,ok,382,87,70,17,6.1,3.0,0.2353,0.0349,,2026_REDB_6,projects/neon-nonprod-earthengine/assets/REFL/REG (AOP_ID=2026_REDB_6) + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)
+2026-11-05 20:57 UTC #rcg6,PIX,4,16,ok,382,87,70,17,8.8,4.0,0.2353,0.0349,,2026_REDB_6,projects/neon-nonprod-earthengine/assets/testREFL/PIX (AOP_ID=2026_REDB_6) + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)
+2026-11-05 20:57 UTC #rcg6,ING,4,16,ok,382,85,68,17,3.8,2.5,0.2353,0.0349,,2026_REDB_6,projects/neon-prod-earthengine/assets/HSI_REFL/002/2026_REDB_6 + projects/neon-nonprod-earthengine/assets/CHM/REG (YEAR_SITE_VISIT=2026_REDB_6)

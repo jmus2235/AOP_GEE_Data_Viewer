@@ -1,12 +1,28 @@
 # Handoff: COG vs ingested performance testing
 
-Written at the end of the session of 2026-11-03 (local; the latest runs are labelled 2026-11-04 UTC). Read this first, then the "Headline results and implications" section at the top of `COG_migration_notes.md`.
+Originally written at the end of the session of 2026-11-03; the "RESUME HERE" section was rewritten on the night of 2026-11-05 and is the current state (everything below it is history). Read "RESUME HERE" first, then the run sections of `COG_migration_notes.md` (the headline section at its top still dates from 2026-11-03 and has not been updated with the REDB results, on purpose).
 
-## RESUME HERE (written the evening of 2026-11-04; testing paused mid-plan)
+## RESUME HERE (written the night of 2026-11-05; testing paused for the day)
 
-**Where the 13-run finishing plan stands.** Done: re-profile of the new `REG_TILES` (about 1.6 EECU·s), render profiles 5a and 5b (ING about 1.58, REG_FULL about 4.53 EECU·s for 21 map tiles), reflectance light run (run 14, clean). **Remaining: run 3, run 4, and the optional run 1b.** Then the separate end-user lessons summary (see "Standing deliverable" below; only when the user says testing is done). Results so far, with site-years and files, are in `COG_migration_notes.md` (sections "REDB test set", "Run 12", "Profiler runs, REDB", "Render profiles, REDB", "Run 13", "Run 14").
+**State.** The 13-run finishing plan of 2026-11-04 is complete, and so are most of the optional extras. Every result is recorded in `COG_migration_notes.md` as a run section with site-year, files and conditions (REDB runs 12 to 24 plus the "Profiler runs, REDB" and "Render profiles, REDB" sections); raw CSVs are in `COG_testing/`. **Deliberately NOT done (user's instruction): the notes' headline section (items 1 to 8) has not been updated with the REDB results, and the separate end-user lessons summary has not been written. Do both only when the user says testing is finished** (see "Standing deliverable" below; the REDB headline text must be rewritten from the run sections).
 
-**Before any run:** reload the Code Editor tab (so no old run is active), paste the ENTIRE current script from disk into it (the Code Editor does not read this folder), press Run once, and never start a second run while one is going (every progress line carries a run id, `[xxxx]`; two ids in the console means two overlapping runs and invalid timings). Claude cannot run Earth Engine; never assume a run happened without pasted output. Save each run's CSV into `COG_testing/` (ask Claude to write it if the text file is not on disk).
+**What was done on 2026-11-04 and 2026-11-05 (notes run numbers, with the main result; all single runs unless stated):**
+- Run 12 and run 17, RGB on REDB (paired): wall-clock close to ingested on a small site; the new `REG_TILES` took 0.3 s against 0.8 s ingested and 0.9 s for the mosaic. RGB EECU (5 km, 10 m): ingested 0.46, REG 5.0, `REG_TILES` 1.6; map render (zoom 13): 1.58 ingested against 4.53 for the viewer's whole-site mosaic.
+- Runs 13 to 16 and 18, reflectance region operations (ING vs band-interleaved BAND vs pixel-interleaved PIX): values identical at 1 m; `BAND` fails with "User memory limit exceeded" for all 426 bands over 1 km at 1 m and 1000 random pixels over 3 km at the default `tileScale`; `tileScale = 4` fixes it and is 3x to 10x faster for every form; EECU (1 km, 10 m) 3 bands ING 0.068, BAND 0.116, PIX 0.183, all bands 4.2, 5.1 and 10.3; PIX tile asset loads cost about 9x to 10x BAND's.
+- Runs 19 to 24, random forest classification (modelled on the user's CLBJ script; 381 bands + registered CHM; 90 made-up labelled points EN/DB/MX/SH/DV, `redb_class_labels.geojson`; script `cog_refl_classification_test.js`): identical predictions at 1 m; at 4 m BAND = PIX and ING differs on 5 of 85 points (whole-site class shares up to 0.8 points, 2.1 at 10 m); at the default `tileScale` registered sampling is 5x to 21x slower than ingested (1.6x to 2.3x at the user's `tileScale` 16); one sample-train-predict pipeline costs about 152 (ING), 117 (BAND), 176 (PIX) EECU·s (two runs each); drawing the classified layer costs about 161, 132 and 194 EECU·s per map tile because the classifier is retrained about twice per map tile; exporting the classified whole site at 4 m costs 282 (ING), 668 (BAND), 643 (PIX) EECU·s as a batch task (much cheaper than the render; the form ranking reverses).
+
+**Optional extras still open (none required):**
+1. `cog_redb_max_anomaly.js` (locates the 5 km RGB maximum anomaly, REG 207 vs ING 183 at 10 m; written, NEVER RUN, no configuration; paste the whole file, Profiler off, expect a possible first-run fix).
+2. Sampling-only profile (the one-request classification pipeline may evaluate the sampling more than once, so the pipeline EECU may be overstated for all forms) and a pipeline profile at `TILE_SCALE = 1`.
+3. 1 m whole-site export (about 16x the 4 m pixels; cost uncertain, possibly several thousand EECU·s per registered form; ask the user first) and a check of the exported 4 m rasters against the `site` class shares.
+4. Repeats for export and render; the EECU repeat of RGB `REG` at 5 km (`cog_vs_ingested_perf_test.js`, single mode); the `REG@REG` render at zoom 16 with ING, `REG_FULL` and `REG` all rerun at that zoom (at zoom 13 the view covers the whole site so `REG@REG` would equal `REG_FULL`).
+5. Rerun `compare` with the CURRENT classification script (the console output of runs 19 and 20 lacks the "dropped points" lists because an older paste was in the Code Editor) to see which two points the registered forms keep at 4 m.
+
+**Next session, suggested order:** (a) run the anomaly script if wanted; (b) ask the user whether testing is finished; (c) if yes, update the notes' headline section with the REDB results and write the separate end-user lessons summary (separate document, with site-year and files for every number quoted); (d) list the data-owner questions (they are also in the notes' "Open questions": pixel-interleaved asset load cost, interleave/block size/compression, BAND vs PIX overview differences, masked-pixel handling in overviews, `YEAR_SITE_VISIT` and wavelengths on the final tiles, why the ingested image has 442 bands).
+
+**Before any run:** reload the Code Editor tab (so no old run is active), paste the ENTIRE current script from disk into it (the Code Editor does not read this folder), press Run once, and never start a second run while one is going (every progress line carries a run id, `[xxxx]`; two ids in the console means two overlapping runs and invalid timings). Claude cannot run Earth Engine; never assume a run happened without pasted output. Save each run's CSV into `COG_testing/` (ask Claude to write it if the text file is not on disk). For Profiler runs: switch the Profiler on before pressing Run; for render profiles wait until the "Viewing N profiles" header and the "Encoding pixels to image" count stop changing and compare per map tile; the Profiler sometimes throws "Profile.getProfiles: Profile not found" (retry later). Batch exports: the cost is the "Batch compute usage" EECU-seconds in the task details, not the runtime.
+
+**The sections "Run 3", "Run 4", "Run 1b" and "After the runs" below are HISTORICAL (all run, see the notes); the 2026-11-04 session notes further down are also historical.**
 
 ### Run 3: heavy reflectance operations, wall-clock (matrix mode, Profiler OFF), about 30 requests, about 15 minutes
 
@@ -49,7 +65,7 @@ Script `cog_vs_ingested_perf_test.js` (paste the whole current file; it contains
 3. When the user says testing is finished: write the separate end-user lessons summary (standing deliverable below).
 4. Questions for the data owner to list in the summary, not runs: what differs in the tile metadata between `RGB/REG` and the `900` collections (asset load about 4.6 ms vs 0.14 ms), the `901` resampling, whether CHM stays NEAREST, whether the final reflectance tiles will carry `YEAR_SITE_VISIT` and wavelengths in the pixel-interleaved form.
 
-**Repository state:** branch `cog-migration-test`, committed and pushed on 2026-11-04 (evening). `COG_testing/README_cog_vs_ingested_perf_test.pdf` (an out-of-date snapshot made by the user) was left uncommitted on purpose.
+**Repository state:** branch `cog-migration-test`, committed and pushed on 2026-11-05 (night; the first push of this work was on 2026-11-04 evening). `COG_testing/README_cog_vs_ingested_perf_test.pdf` (an out-of-date snapshot made by the user) was left uncommitted on purpose.
 
 ## Update, session of 2026-11-04 (details; the rest below dates from 2026-11-03)
 
@@ -80,6 +96,12 @@ We are comparing NEON AOP data stored as ingested Earth Engine images with the s
 | `results_2026-11-03_CHM_JERC2026_run1.csv`, `results_2026-11-03_RGB_JERC2026_9km_run3.csv` | The only raw CSVs saved. Runs 2 and 4 to 11 exist only in the Code Editor console output (the user's console, not in this folder). |
 | `README_cog_vs_ingested_perf_test.pdf` | A PDF snapshot of an earlier README, created by the user; out of date. |
 | `HANDOFF_next_session.md` | This file. |
+| `cog_refl_perf_test.js` | Reflectance harness: ING vs BAND (band-interleaved) vs PIX (pixel-interleaved), matrix (wall-clock) and single (Profiler) modes. Runs 13 to 16 and 18. |
+| `cog_refl_classification_test.js`, `redb_class_labels.geojson`, `cog_redb_label_helper.js` | Random forest classification test (modes compare, profile, site, render, export), its 90 made-up REDB labels (classes EN, DB, MX, SH, DV = 0-4) and the helper that produced them (draw points, print GeoJSON; NLCD 2019 shown as a guide). Runs 19 to 23. |
+| `cog_redb_max_anomaly.js` | Locates the RGB maximum anomaly (REG 207 vs ING 183 at 10 m over 5 km). Written, NOT yet run. |
+| `cog_redb_inventory.js`, `cog_redb_anchor.js` | REDB inventory and site-centre scripts (2026-11-04). |
+| (headline section of the notes) | Deliberately NOT updated with the REDB runs (12 to 23); update it when the optional runs are done and the user says testing is finished, together with the separate end-user summary. |
+| `results_2026-11-04_*.csv`, `results_2026-11-05_*.csv` | Raw CSVs per run: RGB REDB (run 12, run 17), reflectance light (14), heavy (15 as `..._heavy_run1`, 18 as `..._heavy_ts1`), classification `compare` (19, 20), `site` (22). EECU runs (16, 21, 23) have no CSV; the Profiler tables are summarised in the notes. |
 | `../Display_AOP_Image_Collections_app_11G_COG_test.js` | The viewer test build that reads registered RGB/CHM/DEM; stays in the parent folder. |
 
 ## Key facts to have in your head
